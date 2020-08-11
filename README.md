@@ -10,7 +10,7 @@ Install through composer `composer require mkrecek234/multiupload`
 ## Usage
 
 
-Simply add the google-address field in your form with your existing address field.
+Simply add the multiupload field in your form like this.
 
 ```
 $control = $form->addControl('file', [\atk4\multiupload\MultiUpload::class,
@@ -23,4 +23,9 @@ $control->setModel(new \atk4\filestore\Model\File($app->db));
 The ->setModel command is only required if you want to translate tokens into filenames (here as an example for atk4/filestore integration).
 
 A click on the upload icon performs an upload of one or multiple files. A further click adds further items. A click on the "X" icon removes an individual file. A click on the filename performs an onDownload action. The file tokens are stored as comma-separated values in a single field which is very convenient not requiring child-tables just for attached files.
+
+You will see 2 demos:
+1) demos/uploadtest.php to show the standard upload control element
+2) demos/uploadtest-filestore.php to show the integration in atk4/filestore.
+
 
