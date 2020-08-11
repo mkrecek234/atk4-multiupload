@@ -1,5 +1,5 @@
 {
-	"name" : "atk4-multiupload",
+	"name" : "mkrecek234/atk4-multiupload",
 	"type" : "library",
 	"description" : "Upload field based on dropdown for uploading multiple files.",
 	"keywords" : [
