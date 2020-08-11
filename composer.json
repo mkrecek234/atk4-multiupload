@@ -1,0 +1,46 @@
+{
+	"name" : "atk4/multiupload",
+	"type" : "library",
+	"description" : "Upload field based on dropdown for uploading multiple files.",
+	"keywords" : [
+		"atk4",
+		"agile",
+		"agile ui",
+		"data",
+		"framework"
+	],
+	"homepage" : "https://github.com/mkrecek234/multiupload",
+	"license" : "MIT",
+	"minimum-stability" : "dev",
+	"prefer-stable" : true,
+	"authors" : [{
+			"name" : "Michael Krecek",
+			"email" : "info@krecek.net",
+			"homepage" : "http://www.krecek.net"
+		}
+	],
+	"require" : {
+		"atk4/ui" : "*",
+		"php" : ">=7.0.0",
+		"atk4/filestore" : "^0.2.0",
+		"atk4/data" : "~2.2"
+	},
+	"require-dev" : {
+		"behat/behat" : "^3.4",
+		"behat/mink-extension" : "^2.2",
+		"fzaninotto/faker" : "*",
+		"behat/mink-zombie-driver" : "^1.4",
+		"atk4/schema" : "*",
+		"phpunit/phpcov" : "^3.0"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"atk4\\multiupload\\" : "src"
+		}
+	},
+	"autoload-dev" : {
+		"psr-4" : {
+			"atk4\\audit\\tests\\" : "tests/"
+		}
+	}
+}

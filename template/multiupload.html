@@ -1,0 +1,19 @@
+<div id="{$_id}" class="{_ui}ui{/} {$class} {$_class}" style="{$style}" {$attributes}>
+{$BeforeInput}
+{$AfterBeforeInput}
+<input type="text" placeholder="{$PlaceHolder}" readonly/>
+{Input}<input type="{input_type}text{/}" {$input_attributes}/>{/}
+<i class="{DropIcon}dropdown icon{/}"></i>
+<div class="default text">{DefaultText}...{/}</div>
+<div class="menu">
+{Item}
+<div class="item" data-value="{$value}">{Icon}<i class="{$icon}"></i>{/Icon}<div class="filetitle" style="display: inline-block">{$title}</div></div>
+{/Item}
+</div>
+<input type="file" accept="{$accept}" {$multiple} style="display:none"/>
+{$AfterInput}{$AfterAfterInput}
+<div class="ui tiny indicating progress" data-value="1" data-total="100">
+<div class="bar"></div>
+<div class="label"></div>
+</div>
+</div>
