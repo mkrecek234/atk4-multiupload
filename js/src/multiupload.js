@@ -1,7 +1,7 @@
 /*global _ATKVERSION_:true */
 
 import 'core-js/stable';
-import atk from 'atk-multiupload';
+// import atk from 'atk-multiupload';
 import {plugin, createAtkplugins} from "./plugin";
 
 

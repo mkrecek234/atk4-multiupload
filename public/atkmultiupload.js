@@ -14977,27 +14977,6 @@ module.exports = g;
 
 /***/ }),
 
-/***/ "./src/atk-multiupload.js":
-/*!********************************!*\
-  !*** ./src/atk-multiupload.js ***!
-  \********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "jquery");
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _services_multiupload_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./services/multiupload.service */ "./src/services/multiupload.service.js");
-
-
-var atkSemantic = {
-  multiuploadService: _services_multiupload_service__WEBPACK_IMPORTED_MODULE_1__["default"]
-};
-/* harmony default export */ __webpack_exports__["default"] = (atkSemantic);
-
-/***/ }),
-
 /***/ "./src/multiupload.js":
 /*!****************************!*\
   !*** ./src/multiupload.js ***!
@@ -15009,21 +14988,20 @@ var atkSemantic = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var core_js_stable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/stable */ "./node_modules/core-js/stable/index.js");
 /* harmony import */ var core_js_stable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_stable__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var atk_multiupload__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! atk-multiupload */ "./src/atk-multiupload.js");
-/* harmony import */ var _plugin__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./plugin */ "./src/plugin.js");
+/* harmony import */ var _plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./plugin */ "./src/plugin.js");
 /*global _ATKVERSION_:true */
-
+ // import atk from 'atk-multiupload';
 
  // Create atk plugins.
 
-Object(_plugin__WEBPACK_IMPORTED_MODULE_2__["createAtkplugins"])(); //add version function to atk.
+Object(_plugin__WEBPACK_IMPORTED_MODULE_1__["createAtkplugins"])(); //add version function to atk.
 
-atk_multiupload__WEBPACK_IMPORTED_MODULE_1__["default"].version = function () {
+atk.version = function () {
   return "1.14.3";
 }; //Allow to register a plugin with jQuery;
 
 
-atk_multiupload__WEBPACK_IMPORTED_MODULE_1__["default"].registerPlugin = _plugin__WEBPACK_IMPORTED_MODULE_2__["plugin"];
+atk.registerPlugin = _plugin__WEBPACK_IMPORTED_MODULE_1__["plugin"];
 /**
  * Exporting services in order to be available globally
  * or by importing it into your own module.
@@ -15034,7 +15012,7 @@ atk_multiupload__WEBPACK_IMPORTED_MODULE_1__["default"].registerPlugin = _plugin
  *  atk.uploadService.fileUpload();
  */
 
-/* harmony default export */ __webpack_exports__["default"] = (atk_multiupload__WEBPACK_IMPORTED_MODULE_1__["default"]);
+/* harmony default export */ __webpack_exports__["default"] = (atk);
 
 /***/ }),
 

@@ -48,7 +48,7 @@ class File extends \atk4\data\FieldSql
         $this->reference = $this->owner->addRef($this->short_name, function($m) {
             $archive = $this->model;
 
-            if ($m->loaded) {
+            if ($m->loaded()) {
                 $archive->addCondition('token','in', $this->short_name);
                 // only show record of currently loaded record
             }

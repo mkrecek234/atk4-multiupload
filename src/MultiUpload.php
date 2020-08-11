@@ -46,7 +46,7 @@ class MultiUpload extends \atk4\ui\Form\Control\Dropdown
      *
      * @var string
      */
-    public $defaultTemplate = '../template/multiupload.html';
+    public $defaultTemplate = __DIR__.'/../template/multiupload.html';
 
     /**
      * Callback is use for onUpload or onDelete.
