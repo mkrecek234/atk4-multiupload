@@ -5,6 +5,7 @@ class Upload extends \atk4\multiupload\MultiUpload
 {
 
     public $model = null; // File model
+    
 
     function init(): void {
         parent::init();
@@ -12,7 +13,7 @@ class Upload extends \atk4\multiupload\MultiUpload
         $this->onUpload([$this, 'uploaded']);
         $this->onDelete([$this, 'deleted']);
         $this->onDownload([$this, 'downloaded']);
-    
+        
         $this->renderRowFunction = function($record) {
             return [
                 'value' => $record->get('token'),
@@ -40,7 +41,7 @@ class Upload extends \atk4\multiupload\MultiUpload
 
         // store meta-information
         $is = getimagesize($file['tmp_name']);
-        if($f->set('meta_is_image', (boolean)$is)){
+        if($f->set('meta_is_image', (bool) $is)){
             $f->set('meta_mime_type', $is['mime']);
             $f->set('meta_image_width', $is[0]);
             $f->set('meta_image_height', $is[1]);
@@ -54,7 +55,7 @@ class Upload extends \atk4\multiupload\MultiUpload
         $f->save();
         $this->setFileId($f->get('token'));
         
-        $js =  new \atk4\ui\jsNotify(['content' => $f->get('meta_filename').' uploaded!', 'color' => 'green']); 
+        $js =  new \atk4\ui\JsNotify(['content' => $f->get('meta_filename').' uploaded!', 'color' => 'green']); 
         return $js;
     }
 
@@ -63,7 +64,7 @@ class Upload extends \atk4\multiupload\MultiUpload
         $f = $this->field->model;
         $f->tryLoadBy('token', $token);
 
-        $js =  new \atk4\ui\jsNotify(['content' => $f->get('meta_filename').' has been removed!', 'color' => 'green']);
+        $js =  new \atk4\ui\JsNotify(['content' => $f->get('meta_filename').' has been removed!', 'color' => 'green']);
         if ($f->get('status') == 'draft') {
             $f->delete();
         }
@@ -72,10 +73,12 @@ class Upload extends \atk4\multiupload\MultiUpload
     }
     
     public  function downloaded($token)
-    {      $f = $this->field->model;
+    {   $f = $this->field->model;
         $f->tryLoadBy('token', $token);
-    
-        $js =  new \atk4\ui\jsNotify(['content' => $f->get('meta_filename').' is being downloaded!', 'color' => 'green']);
+  
+        $js = [ new \atk4\ui\JsNotify(['content' => $f->get('meta_filename').' is being downloaded!', 'color' => 'green']),
+                ];
+
         return $js;
         
         }

@@ -44,6 +44,10 @@ export default class multifileUpload extends atkPlugin {
     if (this.settings.file.id) {
       this.setState('added');
     }
+    
+    if (this.action.hasClass('disabled')) {
+      this.$el.find('i[class="delete icon"]').hide();
+    }
   }
 
   /**

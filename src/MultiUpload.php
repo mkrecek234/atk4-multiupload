@@ -86,13 +86,13 @@ class MultiUpload extends \atk4\ui\Form\Control\Dropdown
      * Keep track of Multi Upload api js file loaded or not.
      * @var bool
      */
-    public static $isJsLoaded = false;
+    public $isJsLoaded = false;
 
     /** @var bool check if callback is trigger by one of the action. */
     private $_isCbRunning = false;
     
         public function init(): void
-    {   
+        {   
         parent::init();
         
         $this->values = [];
@@ -211,7 +211,7 @@ class MultiUpload extends \atk4\ui\Form\Control\Dropdown
                 $action = $_POST['action'] ?? null;
                 $files = $_FILES ?? null;
 
-                if ($action === 'upload' && !$files['error']) {
+                if ($action === 'upload' && !$files['file']['error']) {
                     $this->cb->set(function () use ($fx, $files) {
                         foreach ($files as $file) {
 
@@ -222,7 +222,7 @@ class MultiUpload extends \atk4\ui\Form\Control\Dropdown
                         }
                         return $this->jsActions;
                     });
-                } elseif ($action === null || isset($files['error'])) {
+                } elseif ($action === null || isset($files['file']['error'])) {
                     $this->cb->set(function () use ($fx, $files) {
                         return call_user_func($fx, 'error');
                     });

@@ -49,9 +49,9 @@ class File extends \atk4\data\FieldSql
             $archive = $this->model;
 
             if ($m->loaded()) {
-                $archive->addCondition('token','in', $this->short_name);
+                //$archive->ref($this->short_name)->addCondition('token','in', $m->getField($this->short_name));
                 // only show record of currently loaded record
-            }
+            } 
             return $archive;
         });
         
