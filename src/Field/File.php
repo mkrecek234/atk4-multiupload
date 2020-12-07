@@ -34,7 +34,7 @@ class File extends \atk4\data\FieldSql
     public $fieldFilename;
     public $fieldURL;
 
-    public function init(): void
+    protected function init(): void
     {
         $this->_init();
 
