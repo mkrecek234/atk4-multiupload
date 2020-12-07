@@ -20,10 +20,10 @@
 		}
 	],
 	"require" : {
-		"atk4/ui" : "*",
+		"atk4/ui" : "dev-develop",
 		"php" : ">=7.0.0",
 		"atk4/filestore" : "^0.2.0",
-		"atk4/data" : "~2.2"
+		"atk4/data" : "dev-develop"
 	},
 	"require-dev" : {
 		"behat/behat" : "^3.4",
