@@ -29,12 +29,10 @@ class File extends \atk4\data\FieldSql
 
     public $normalizedField = null;
 
-    public $referenceModel;
-
     public $fieldFilename;
     public $fieldURL;
 
-    protected function init(): void
+    public function init(): void
     {
         $this->_init();
 
@@ -44,18 +42,30 @@ class File extends \atk4\data\FieldSql
         }
 
         $this->normalizedField = preg_replace('/_id$/', '', $this->short_name);
+        
+        $this->reference = $this->owner->addRef($this->short_name, function($m, $c, $d) {
+            $archive = $this->model->newInstance(); // (clone $this->model); //->newInstance(); // (clone $this->model);
 
-        $this->reference = $this->owner->addRef($this->short_name, function($m) {
-            $archive = $this->model;
+            if ($m->get($this->short_name)) {
+             
+                $archive->addCondition($archive->expr("FIND_IN_SET(token,'".$m->get($this->short_name)."')>0"));
 
-            if ($m->loaded()) {
-                //$archive->ref($this->short_name)->addCondition('token','in', $m->getField($this->short_name));
-                // only show record of currently loaded record
-            } 
+                 // only show record of currently loaded record
+                
+                
+            } else {
+                $parent = (clone $this->owner);
+                $parent->loadAny()->get();
+ 
+                $archive->addCondition($archive->expr("FIND_IN_SET(token,'".$parent->get($this->short_name)."')>0"));
+
+            }
+            
             return $archive;
         });
         
-     //   $this->importFields();
+        
+      //  $this->importFields();
 
         $this->owner->onHook(\atk4\data\Model::HOOK_BEFORE_SAVE, function($m) {
             if ($m->isDirty($this->short_name)) {

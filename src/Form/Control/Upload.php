@@ -7,7 +7,7 @@ class Upload extends \atk4\multiupload\MultiUpload
     public $model = null; // File model
     
 
-    protected function init(): void {
+    function init(): void {
         parent::init();
 
         $this->onUpload([$this, 'uploaded']);
@@ -22,6 +22,7 @@ class Upload extends \atk4\multiupload\MultiUpload
         };
 
     }
+    
 
     public function uploaded($file)
     {

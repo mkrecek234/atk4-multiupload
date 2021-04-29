@@ -81,11 +81,6 @@ class MultiUpload extends \atk4\ui\Form\Control\Dropdown
     public $hasDownloadCb = false;
 
     public $jsActions = [];
-    
-    public const UPLOAD_ACTION = 'upload';
-    public const DELETE_ACTION = 'delete';
-    public const DOWNLOAD_ACTION = 'download';
-    
 
     /**
      * Keep track of Multi Upload api js file loaded or not.
@@ -96,7 +91,7 @@ class MultiUpload extends \atk4\ui\Form\Control\Dropdown
     /** @var bool check if callback is trigger by one of the action. */
     private $_isCbRunning = false;
     
-        protected function init(): void
+        public function init(): void
         {   
         parent::init();
         
@@ -125,7 +120,7 @@ class MultiUpload extends \atk4\ui\Form\Control\Dropdown
      *
      * @return $this|void
      */
-    /*public function set($fileId = null, $fileName = null, $junk = null)
+ /*   public function set($fileId = null, $fileName = null, $junk = null)
     {
         $this->setFileId($fileId);
 
@@ -189,12 +184,12 @@ class MultiUpload extends \atk4\ui\Form\Control\Dropdown
         if (is_callable($fx)) {
             $this->hasDeleteCb = true;
             $action = $_POST['action'] ?? null;
-            if ((($_POST['action'] ?? null) === self::DELETE_ACTION) && $action === 'delete') {
+            if ($this->cb->triggered() && $action === 'delete') {
                 $this->_isCbRunning = true;
                 $fileName = $_POST['f_name'] ?? null;
                 $this->cb->set(function () use ($fx, $fileName) {
                     $this->addJsAction(call_user_func_array($fx, [$fileName]));
-                    
+
                     return $this->jsActions;
                 });
             }
@@ -209,22 +204,21 @@ class MultiUpload extends \atk4\ui\Form\Control\Dropdown
      */
     public function onUpload($fx = null)
     {
-        
         if (is_callable($fx)) {
             $this->hasUploadCb = true;
-            if (($_POST['action'] ?? null) === self::UPLOAD_ACTION) {
+            if ($this->cb->triggered()) {
                 $this->_isCbRunning = true;
                 $action = $_POST['action'] ?? null;
                 $files = $_FILES ?? null;
-                
-                if ($action === self::UPLOAD_ACTION && !$files['file']['error']) {
+
+                if ($action === 'upload' && !$files['file']['error']) {
                     $this->cb->set(function () use ($fx, $files) {
                         foreach ($files as $file) {
-                            
-                            $this->addJsAction(call_user_func_array($fx, [$file]));
-                            $this->addJsAction([
-                                $this->js()->atkmultiFileUpload('updateField', [$this->fileId, $file['name']])
-                            ]);
+
+                        $this->addJsAction(call_user_func_array($fx, [$file]));
+                        $this->addJsAction([
+                            $this->js()->atkmultiFileUpload('updateField', [$this->fileId, $file['name']])
+                        ]);
                         }
                         return $this->jsActions;
                     });
@@ -248,7 +242,7 @@ class MultiUpload extends \atk4\ui\Form\Control\Dropdown
         if (is_callable($fx)) {
             $this->hasDownloadCb = true;
             $action = $_POST['action'] ?? null;
-            if (($_POST['action'] ?? null) === self::DOWNLOAD_ACTION) {
+            if ($this->cb->triggered() && $action === 'download') {
                 $this->_isCbRunning = true;
                 $fileName = $_POST['f_name'] ?? null;
                 $this->cb->set(function () use ($fx, $fileName) {
@@ -283,7 +277,7 @@ class MultiUpload extends \atk4\ui\Form\Control\Dropdown
         }
         
         if (!$this->isJsLoaded) {
-            $this->app->requireJs('../public/atkmultiupload.js');
+            $this->app->requireJs('./public/atkmultiupload.min.js');
         }
        
  
