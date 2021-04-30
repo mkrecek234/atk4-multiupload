@@ -44,23 +44,20 @@ class File extends \atk4\data\FieldSql
         $this->normalizedField = preg_replace('/_id$/', '', $this->short_name);
         
         $this->reference = $this->owner->addRef($this->short_name, function($m, $c, $d) {
-            $archive = $this->model->newInstance(); // (clone $this->model); //->newInstance(); // (clone $this->model);
+            $archive = $this->model->newInstance();
 
+            // only show records of currently loaded record
             if ($m->get($this->short_name)) {
-             
                 $archive->addCondition($archive->expr("FIND_IN_SET(token,'".$m->get($this->short_name)."')>0"));
-
-                 // only show record of currently loaded record
-                
-                
-            } else {
+            } else { // This case happens if virtual page contains this field - then $m not loaded, but we can get the parent field with this here.
                 $parent = (clone $this->owner);
-                $parent->loadAny()->get();
- 
-                $archive->addCondition($archive->expr("FIND_IN_SET(token,'".$parent->get($this->short_name)."')>0"));
-
-            }
-            
+                $parent->tryLoadAny()->get();
+                 
+                if ($parent->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".$parent->get($this->short_name)."')>0")); 
+                } else {
+                    $archive->addCondition('id', -1);
+                }
+           }
             return $archive;
         });
         
