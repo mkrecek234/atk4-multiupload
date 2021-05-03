@@ -1,6 +1,5 @@
 <?php
 
-// vim:ts=4:sw=4:et:fdm=marker:fdl=0
 
 namespace atk4\multiupload\Field;
 
@@ -31,6 +30,8 @@ class File extends \atk4\data\FieldSql
 
     public $fieldFilename;
     public $fieldURL;
+    
+    public $parent_id = null;
 
     public function init(): void
     {
@@ -45,22 +46,23 @@ class File extends \atk4\data\FieldSql
         
         $this->reference = $this->owner->addRef($this->short_name, function($m, $c, $d) {
             $archive = $this->model->newInstance();
-
+            
             // only show records of currently loaded record
-            if ($m->get($this->short_name)) {
-                $archive->addCondition($archive->expr("FIND_IN_SET(token,'".$m->get($this->short_name)."')>0"));
-            } else { // This case happens if virtual page contains this field - then $m not loaded, but we can get the parent field with this here.
-                $parent = (clone $this->owner);
-                $parent->tryLoadAny()->get();
+            if ($m->loaded()) {
+                $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($m->get($this->short_name) ?? 0)."')>0"));
+            } elseif ($_REQUEST['mid']) { 
+                // Very bad workaround as the parent model id cannot be found in the variables - $m is not loaded for VirtualPage modals yet, but it is in the $_REQUEST.
                  
-                if ($parent->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".$parent->get($this->short_name)."')>0")); 
+                $mcloned = (clone $this->owner);
+                $mcloned->load($_REQUEST['mid']);
+
+                if ($mcloned->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($mcloned->get($this->short_name) ?? 0)."')>0")); 
                 } else {
                     $archive->addCondition('id', -1);
                 }
            }
             return $archive;
         });
-        
         
       //  $this->importFields();
 
