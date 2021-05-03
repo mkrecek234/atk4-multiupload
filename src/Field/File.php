@@ -30,8 +30,7 @@ class File extends \atk4\data\FieldSql
 
     public $fieldFilename;
     public $fieldURL;
-    
-    public $parent_id = null;
+
 
     public function init(): void
     {
@@ -49,18 +48,21 @@ class File extends \atk4\data\FieldSql
             
             // only show records of currently loaded record
             if ($m->loaded()) {
-                $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($m->get($this->short_name) ?? 0)."')>0"));
+                $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($m->get($this->short_name) ?? 'notavailable')."')>0"));
             } elseif ($_REQUEST['mid']) { 
                 // Very bad workaround as the parent model id cannot be found in the variables - $m is not loaded for VirtualPage modals yet, but it is in the $_REQUEST.
                  
                 $mcloned = (clone $this->owner);
                 $mcloned->load($_REQUEST['mid']);
 
-                if ($mcloned->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($mcloned->get($this->short_name) ?? 0)."')>0")); 
+                if ($mcloned->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($mcloned->get($this->short_name) ?? 'notavailable')."')>0")); 
                 } else {
                     $archive->addCondition('id', -1);
                 }
-           }
+            } else {
+                $archive->addCondition('id', -1);
+            }
+            
             return $archive;
         });
         
