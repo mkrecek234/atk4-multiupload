@@ -57,10 +57,10 @@ class File extends \atk4\data\FieldSql
 
                 if ($mcloned->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($mcloned->get($this->short_name) ?? 'notavailable')."')>0")); 
                 } else {
-                    $archive->addCondition('id', -1);
+                    $archive->setLimit(20);
                 }
             } else {
-                $archive->addCondition('id', -1);
+                $archive->setLimit(20);
             }
             
             return $archive;
@@ -115,4 +115,16 @@ class File extends \atk4\data\FieldSql
     {
         return parent::normalize($value);
     }
+    
+/**
+ * Idea: update model to reflect current tokens, but not called at init...
+ * 
+    public function set($value): self
+    {
+        $this->owner->set($this->short_name, $value);
+        $this->model->addCondition($this->model->expr("FIND_IN_SET(token,'".($value) ?? 'notavailable')."')>0"));
+        
+        return $this;
+    }
+     */
 }
