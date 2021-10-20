@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace atk4\multiupload;
+namespace Atk4\Multiupload;
 
-use atk4\ui\Exception;
+use Atk4\Ui\Exception;
 
 /**
  * Class Upload.
  */
-class MultiUpload extends \atk4\ui\Form\Control\Dropdown
+class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
 {
    // public $inputType = 'hidden';
     /**
@@ -51,7 +51,7 @@ class MultiUpload extends \atk4\ui\Form\Control\Dropdown
     /**
      * Callback is use for onUpload or onDelete.
      *
-     * @var \atk4\ui\JsCallback
+     * @var \Atk4\Ui\JsCallback
      */
     public $cb;
 
@@ -91,7 +91,7 @@ class MultiUpload extends \atk4\ui\Form\Control\Dropdown
     /** @var bool check if callback is trigger by one of the action. */
     private $_isCbRunning = false;
     
-        public function init(): void
+    protected function init(): void
         {   
         parent::init();
         
@@ -102,10 +102,10 @@ class MultiUpload extends \atk4\ui\Form\Control\Dropdown
         $this->isMultiple = true;
         //$this->inputType = 'hidden';
 
-        $this->cb = \atk4\ui\JsCallback::addTo($this);
+        $this->cb = \Atk4\Ui\JsCallback::addTo($this);
 
         if (!$this->action) {
-            $this->action = new \atk4\ui\Button(['icon' => 'upload', 'disabled' => ($this->disabled || $this->readonly)]);
+            $this->action = new \Atk4\Ui\Button(['icon' => 'upload', 'disabled' => ($this->disabled || $this->readonly)]);
         }
     }
 

@@ -18,7 +18,7 @@ $control = $form->addControl('file', [\atk4\multiupload\MultiUpload::class,
     'isMultiple' => true
 ]
     );
-$control->setModel(new \atk4\filestore\Model\File($app->db));
+$control->setModel(new \Atk4\Filestore\Model\File($app->db));
 ```
 The ->setModel command is only required if you want to translate tokens into filenames (here as an example for atk4/filestore integration).
 

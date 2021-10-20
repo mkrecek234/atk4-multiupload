@@ -2,29 +2,29 @@
 
 declare(strict_types=1);
 
-namespace atk4;
+namespace Atk4;
 
-use atk4\ui\Form;
-use atk4\filestore\Model\File;
+use Atk4\Ui\Form;
+use Atk4\Filestore\Model\File;
 
-/** @var \atk4\ui\App $app */
+/** @var \Atk4\Ui\App $app */
 
 include '../vendor/autoload.php';
 
-$app = new \atk4\ui\App('centered', false, true);
-$app->initLayout([\atk4\ui\Layout\Centered::class]); 
-$app->db = $app->add(new \atk4\data\Persistence\Sql('mysql://root:root@localhost/atk4'));
+$app = new \Atk4\Ui\App('centered', false, true);
+$app->initLayout([\Atk4\Ui\Layout\Centered::class]); 
+$app->db = new \Atk4\Data\Persistence\Sql('mysql://root:root@localhost/atk4');
 
 
 $form = Form::addTo($app);
 
-$control = $form->addControl('file', [\atk4\multiupload\MultiUpload::class,
+$control = $form->addControl('file', [\Atk4\Multiupload\MultiUpload::class,
     'empty'      => 'Upload multiple files',
     'isMultiple' => true,
   //  'dropdownOptions' => ['allowAdditions' => true]
 ]
     );
-$control->setModel(new \atk4\filestore\Model\File($app->db));
+$control->setModel(new \Atk4\Filestore\Model\File($app->db));
 /* 
  * Example for manual file ids and filenames
 $control->setSource([['id' =>"token-5f2fec025c3bb", 'name' =>'test.php'], ['id' =>"token-5f2fec025c3bc", 'name' =>'test2.php']]);
@@ -33,7 +33,7 @@ $control->set("token-5f2fec025c3bb,token-5f2fec025c3bc");
 
 
 $control->onDelete(function ($fileId) {
-    return new \atk4\ui\JsToast([
+    return new \Atk4\Ui\JsToast([
         'title' => 'Delete successfully',
         'message' => $fileId . ' has been removed',
         'class' => 'success',
@@ -41,7 +41,7 @@ $control->onDelete(function ($fileId) {
 });
 
 $control->onDownload(function ($fileId) {
-    return new \atk4\ui\JsToast([
+    return new \Atk4\Ui\JsToast([
         'title' => 'Download successfully',
         'message' => $fileId . ' is being downloaded',
         'class' => 'success',
@@ -54,7 +54,7 @@ $control->onUpload(function ($files) use ($form, $control) {
     }
     $control->setFileId('a_token'.rand(0,100));
 
-    return new \atk4\ui\JsToast([
+    return new \Atk4\Ui\JsToast([
         'title' => 'Upload success',
         'message' => 'File '. $files['name'] . ' with token is uploaded!',
         'class' => 'success',
@@ -62,14 +62,14 @@ $control->onUpload(function ($files) use ($form, $control) {
 });
 
 
-$control2 = $form->addControl('file2', [\atk4\ui\Form\Control\Upload::class]
+$control2 = $form->addControl('file2', [\Atk4\Ui\Form\Control\Upload::class]
     );
 
 $control2->set('a_new_token', 'an-img-file-name');
     
 $control2->onDelete(function ($fileId) use ($img) {
         
-        return new \atk4\ui\JsToast([
+        return new \Atk4\Ui\JsToast([
             'title' => 'Delete successfully',
             'message' => $fileId . ' has been removed',
             'class' => 'success',
@@ -93,7 +93,7 @@ $control2->onDelete(function ($fileId) use ($img) {
             //return $form->error('file', 'Unable to upload file.');
             
             // can also return a notifier.
-            return new \atk4\ui\JsToast([
+            return new \Atk4\Ui\JsToast([
                 'title' => 'Upload success',
                 'message' => 'Image is uploaded!',
                 'class' => 'success',

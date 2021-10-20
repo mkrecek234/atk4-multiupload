@@ -19,23 +19,30 @@
 			"homepage" : "http://www.krecek.net"
 		}
 	],
+ 	"repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/mkrecek234/atk4-multiupload"
+        }
+    	],
+
 	"require" : {
 		"atk4/ui" : "*",
 		"php" : ">=7.0.0",
-		"atk4/filestore" : "^0.2.0",
-		"atk4/data" : "~2.2"
+		"mkrecek234/filestore" : "~3.0",
+		"atk4/data" : "~3.0"
 	},
 	"require-dev" : {
 		"behat/behat" : "^3.4",
 		"behat/mink-extension" : "^2.2",
 		"fzaninotto/faker" : "*",
 		"behat/mink-zombie-driver" : "^1.4",
-		"atk4/schema" : "*",
+
 		"phpunit/phpcov" : "^3.0"
 	},
 	"autoload" : {
 		"psr-4" : {
-			"atk4\\multiupload\\" : "src"
+			"Atk4\\Multiupload\\" : "src"
 		}
 	},
 	"autoload-dev" : {

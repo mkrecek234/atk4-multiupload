@@ -4,7 +4,7 @@
 
 namespace atk4\multiupload\Field;
 
-class File extends \atk4\data\FieldSql
+class File extends \Atk4\Data\FieldSql
 {
     use \atk4\core\InitializerTrait {
         init as _init;
@@ -39,7 +39,7 @@ class File extends \atk4\data\FieldSql
         $this->_init();
 
         if (!$this->model) {
-            $this->model = new \atk4\filestore\Model\File($this->owner->persistence);
+            $this->model = new \Atk4\Filestore\Model\File($this->owner->persistence);
             $this->model->flysystem = $this->flysystem;
         }
 
@@ -57,7 +57,7 @@ class File extends \atk4\data\FieldSql
         
      //   $this->importFields();
 
-        $this->owner->onHook(\atk4\data\Model::HOOK_BEFORE_SAVE, function($m) {
+        $this->owner->onHook(\Atk4\Data\Model::HOOK_BEFORE_SAVE, function($m) {
             if ($m->isDirty($this->short_name)) {
                 $oldtokens = $m->dirty[$this->short_name];
                 $newtokens = $m->get($this->short_name);
@@ -79,7 +79,7 @@ class File extends \atk4\data\FieldSql
                 }
             }
         });
-            $this->owner->onHook(\atk4\data\Model::HOOK_BEFORE_DELETE, function($m) {
+            $this->owner->onHook(\Atk4\Data\Model::HOOK_BEFORE_DELETE, function($m) {
             $tokens = $m->get($this->short_name);
             if ($tokens) {
                 foreach (explode(',', $tokens) as $token) {

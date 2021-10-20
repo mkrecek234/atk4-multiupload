@@ -1,13 +1,13 @@
 <?php
-namespace atk4\multiupload\Form\Control;
+namespace Atk4\Multiupload\Form\Control;
 
-class Upload extends \atk4\multiupload\MultiUpload 
+class Upload extends \Atk4\Multiupload\MultiUpload 
 {
 
     public $model = null; // File model
     
 
-    function init(): void {
+  protected function init(): void {
         parent::init();
 
         $this->onUpload([$this, 'uploaded']);
@@ -55,7 +55,7 @@ class Upload extends \atk4\multiupload\MultiUpload
         $f->save();
         $this->setFileId($f->get('token'));
         
-        $js =  new \atk4\ui\JsNotify(['content' => $f->get('meta_filename').' uploaded!', 'color' => 'green']); 
+        $js =  new \Atk4\Ui\JsNotify(['content' => $f->get('meta_filename').' uploaded!', 'color' => 'green']); 
         return $js;
     }
 
@@ -64,7 +64,7 @@ class Upload extends \atk4\multiupload\MultiUpload
         $f = $this->field->model;
         $f->tryLoadBy('token', $token);
 
-        $js =  new \atk4\ui\JsNotify(['content' => $f->get('meta_filename').' has been removed!', 'color' => 'green']);
+        $js =  new \Atk4\Ui\JsNotify(['content' => $f->get('meta_filename').' has been removed!', 'color' => 'green']);
         if ($f->get('status') == 'draft') {
             $f->delete();
         }
@@ -76,7 +76,7 @@ class Upload extends \atk4\multiupload\MultiUpload
     {   $f = $this->field->model;
         $f->tryLoadBy('token', $token);
   
-        $js = [ new \atk4\ui\JsNotify(['content' => $f->get('meta_filename').' is being downloaded!', 'color' => 'green']),
+        $js = [ new \Atk4\Ui\JsNotify(['content' => $f->get('meta_filename').' is being downloaded!', 'color' => 'green']),
                 ];
 
         return $js;
