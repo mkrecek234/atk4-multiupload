@@ -41,7 +41,8 @@ class Upload extends \Atk4\Multiupload\MultiUpload
 
         // store meta-information
         $is = getimagesize($file['tmp_name']);
-        if($f->set('meta_is_image', (bool) $is)){
+        $f->set('meta_is_image', (bool) $is);
+        if ($is){
             $f->set('meta_mime_type', $is['mime']);
             $f->set('meta_image_width', $is[0]);
             $f->set('meta_image_height', $is[1]);

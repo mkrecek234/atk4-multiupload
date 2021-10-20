@@ -37,21 +37,34 @@ class File extends \Atk4\Data\FieldSql
     public function init(): void
     {
         $this->_init();
-
+        
         if (!$this->model) {
-            $this->model = new \Atk4\Filestore\Model\File($this->owner->persistence);
+            $this->model = new \atk4\filestore\Model\File($this->owner->persistence);
             $this->model->flysystem = $this->flysystem;
         }
-
+        
         $this->normalizedField = preg_replace('/_id$/', '', $this->short_name);
-
-        $this->reference = $this->owner->addRef($this->short_name, function($m) {
-            $archive = $this->model;
-
+        
+        $this->reference = $this->owner->addRef($this->short_name, function($m, $c, $d) {
+            $archive = $this->model->newInstance();
+            
+            // only show records of currently loaded record
             if ($m->loaded()) {
-                //$archive->ref($this->short_name)->addCondition('token','in', $m->getField($this->short_name));
-                // only show record of currently loaded record
-            } 
+                $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($m->get($this->short_name) ?? 'notavailable')."')>0"));
+            } elseif (array_key_exists('mid', $_REQUEST)) {
+                // Very bad workaround as the parent model id cannot be found in the variables - $m is not loaded for VirtualPage modals yet, but it is in the $_REQUEST.
+                
+                $mcloned = (clone $this->owner);
+                $mcloned->load($_REQUEST['mid']);
+                
+                if ($mcloned->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($mcloned->get($this->short_name) ?? 'notavailable')."')>0"));
+                } else {
+                    $archive->setLimit(20);
+                }
+            } else {
+                $archive->setLimit(20);
+            }
+            
             return $archive;
         });
         
@@ -104,4 +117,15 @@ class File extends \Atk4\Data\FieldSql
     {
         return parent::normalize($value);
     }
+    /**
+     * Idea: update model to reflect current tokens, but not called at init...
+     *
+     public function set($value): self
+     {
+     $this->owner->set($this->short_name, $value);
+     $this->model->addCondition($this->model->expr("FIND_IN_SET(token,'".($value) ?? 'notavailable')."')>0"));
+     
+     return $this;
+     }
+     */
 }

@@ -22,14 +22,14 @@
  	"repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/mkrecek234/atk4-multiupload"
+            "url": "https://github.com/mkrecek234/filestore"
         }
     	],
 
 	"require" : {
 		"atk4/ui" : "*",
 		"php" : ">=7.0.0",
-		"mkrecek234/filestore" : "~3.0",
+		"atk4/filestore" : "~3.0",
 		"atk4/data" : "~3.0"
 	},
 	"require-dev" : {
