@@ -10,9 +10,9 @@ class Upload extends \Atk4\Multiupload\MultiUpload
   protected function init(): void {
         parent::init();
 
-        $this->onUpload([$this, 'uploaded']);
-        $this->onDelete([$this, 'deleted']);
-        $this->onDownload([$this, 'downloaded']);
+        $this->onUpload(\Closure::fromCallable([$this, 'uploaded']));
+        $this->onDelete(\Closure::fromCallable([$this, 'deleted']));
+        $this->onDownload(\Closure::fromCallable([$this, 'downloaded']));
         
         $this->renderRowFunction = function($record) {
             return [
@@ -27,7 +27,7 @@ class Upload extends \Atk4\Multiupload\MultiUpload
     {
         // provision a new file for specified flysystem
         $f = $this->field->model;
-        $f->newFile($this->field->flysystem);
+        $entity = $f->newFile($this->field->flysystem);
 
         // add (or upload) the file
         $stream = fopen($file['tmp_name'], 'r+');
@@ -37,37 +37,37 @@ class Upload extends \Atk4\Multiupload\MultiUpload
         }
 
         // get meta from browser
-        $f->set('meta_mime_type', $file['type']);
+        $entity->set('meta_mime_type', $file['type']);
 
         // store meta-information
         $is = getimagesize($file['tmp_name']);
-        $f->set('meta_is_image', (bool) $is);
+        $entity->set('meta_is_image', (bool) $is);
         if ($is){
-            $f->set('meta_mime_type', $is['mime']);
-            $f->set('meta_image_width', $is[0]);
-            $f->set('meta_image_height', $is[1]);
+            $entity->set('meta_mime_type', $is['mime']);
+            $entity->set('meta_image_width', $is[0]);
+            $entity->set('meta_image_height', $is[1]);
             //$m['extension'] = $is['mime'];
         }
-        $f->set('meta_md5',md5_file($file['tmp_name']));
-        $f->set('meta_filename', $file['name']);
-        $f->set('meta_size', $file['size']);
+        $entity->set('meta_md5',md5_file($file['tmp_name']));
+        $entity->set('meta_filename', $file['name']);
+        $entity->set('meta_size', $file['size']);
 
 
-        $f->save();
-        $this->setFileId($f->get('token'));
+        $entity->save();
+        $this->setFileId($entity->get('token'));
         
-        $js =  new \Atk4\Ui\JsNotify(['content' => $f->get('meta_filename').' uploaded!', 'color' => 'green']); 
+        $js =  new \Atk4\Ui\JsNotify(['content' => $entity->get('meta_filename').' uploaded!', 'color' => 'green']); 
         return $js;
     }
 
     public  function deleted($token)
     {
         $f = $this->field->model;
-        $f->tryLoadBy('token', $token);
+        $entity = $f->tryLoadBy('token', $token);
 
-        $js =  new \Atk4\Ui\JsNotify(['content' => $f->get('meta_filename').' has been removed!', 'color' => 'green']);
-        if ($f->get('status') == 'draft') {
-            $f->delete();
+        $js =  new \Atk4\Ui\JsNotify(['content' => $entity->get('meta_filename').' has been removed!', 'color' => 'green']);
+        if ($entity->get('status') == 'draft') {
+            $entity->delete();
         }
 
         return $js;
@@ -75,9 +75,9 @@ class Upload extends \Atk4\Multiupload\MultiUpload
     
     public  function downloaded($token)
     {   $f = $this->field->model;
-        $f->tryLoadBy('token', $token);
+        $entity = $f->tryLoadBy('token', $token);
   
-        $js = [ new \Atk4\Ui\JsNotify(['content' => $f->get('meta_filename').' is being downloaded!', 'color' => 'green']),
+        $js = [ new \Atk4\Ui\JsNotify(['content' => $entity->get('meta_filename').' is being downloaded!', 'color' => 'green']),
                 ];
 
         return $js;

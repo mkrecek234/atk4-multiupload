@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace atk4\multiupload;
+namespace Atk4\Multiupload;
 
 use Atk4\Ui\Form;
 
@@ -19,32 +19,32 @@ class PersistenceSql extends \Atk4\Data\Persistence\Sql
 }
 
 // change this as needed
-$app->db = $app->add(new \atk4\multiupload\PersistenceSql('mysql://root:root@localhost/atk4'));
+$app->db = new \atk4\multiupload\PersistenceSql('mysql://root:root@localhost/atk4');
+$app->db->setApp($app);
 
-$adapter = new \League\Flysystem\Adapter\Local(__DIR__.'/localfiles');
+$adapter = new \League\Flysystem\Local\LocalFilesystemAdapter(__DIR__.'/localfiles');
 $app->filesystem = new \League\Flysystem\Filesystem($adapter);
 
 
 
 class Friend extends \Atk4\Data\Model {
-    
-    use \atk4\core\AppScopeTrait;
-    
+        
     public $table = 'friend';
     
-    function init() : void {
+    protected function init() : void {
         parent::init();
         
         $this->addField('name'); // friend's name
-        $this->addField('file', new \atk4\multiupload\Field\File($this->app->filesystem)); // storing file here
+        $this->addField('file', new \Atk4\Multiupload\Field\File($this->persistence->getApp()->filesystem)); // storing file here
         
     }
 }
 
 $form = Form::addTo($app);
+$model = new Friend($app->db);
+$entity = $model->tryLoad(7);
+$form->setModel($entity);
 
-$form->setModel(new Friend($app->db));
-$form->model->tryLoad(7);
 
 $gr = $app->add([\Atk4\Ui\Grid::class, 'menu'=>false, 'paginator'=>false]);
 $gr->setModel(new \Atk4\Filestore\Model\File($app->db));

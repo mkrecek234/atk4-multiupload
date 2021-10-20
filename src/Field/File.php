@@ -2,16 +2,16 @@
 
 // vim:ts=4:sw=4:et:fdm=marker:fdl=0
 
-namespace atk4\multiupload\Field;
+namespace Atk4\Multiupload\Field;
 
 class File extends \Atk4\Data\FieldSql
 {
-    use \atk4\core\InitializerTrait {
+    use \Atk4\Core\InitializerTrait {
         init as _init;
     }
 
 
-    public $ui = ['form' => [\atk4\multiupload\Form\Control\Upload::class]];
+    public $ui = ['form' => [\Atk4\Multiupload\Form\Control\Upload::class]];
 
     /**
      * Set a custom model for File
@@ -34,18 +34,18 @@ class File extends \Atk4\Data\FieldSql
     public $fieldFilename;
     public $fieldURL;
 
-    public function init(): void
+    protected function init(): void
     {
         $this->_init();
         
         if (!$this->model) {
-            $this->model = new \atk4\filestore\Model\File($this->owner->persistence);
+            $this->model = new \Atk4\Filestore\Model\File($this->getOwner()->persistence);
             $this->model->flysystem = $this->flysystem;
         }
         
         $this->normalizedField = preg_replace('/_id$/', '', $this->short_name);
         
-        $this->reference = $this->owner->addRef($this->short_name, function($m, $c, $d) {
+        $this->reference = $this->getOwner()->addRef($this->short_name, ['model' => function($m, $c, $d) {
             $archive = $this->model->newInstance();
             
             // only show records of currently loaded record
@@ -66,11 +66,11 @@ class File extends \Atk4\Data\FieldSql
             }
             
             return $archive;
-        });
+        }]);
         
      //   $this->importFields();
 
-        $this->owner->onHook(\Atk4\Data\Model::HOOK_BEFORE_SAVE, function($m) {
+        $this->getOwner()->onHook(\Atk4\Data\Model::HOOK_BEFORE_SAVE, function($m) {
             if ($m->isDirty($this->short_name)) {
                 $oldtokens = $m->dirty[$this->short_name];
                 $newtokens = $m->get($this->short_name);
@@ -92,7 +92,7 @@ class File extends \Atk4\Data\FieldSql
                 }
             }
         });
-            $this->owner->onHook(\Atk4\Data\Model::HOOK_BEFORE_DELETE, function($m) {
+            $this->getOwner()->onHook(\Atk4\Data\Model::HOOK_BEFORE_DELETE, function($m) {
             $tokens = $m->get($this->short_name);
             if ($tokens) {
                 foreach (explode(',', $tokens) as $token) {

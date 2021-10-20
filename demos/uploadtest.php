@@ -67,7 +67,7 @@ $control2 = $form->addControl('file2', [\Atk4\Ui\Form\Control\Upload::class]
 
 $control2->set('a_new_token', 'an-img-file-name');
     
-$control2->onDelete(function ($fileId) use ($img) {
+$control2->onDelete(function ($fileId) {
         
         return new \Atk4\Ui\JsToast([
             'title' => 'Delete successfully',
@@ -78,7 +78,7 @@ $control2->onDelete(function ($fileId) use ($img) {
         
         
         
-        $control2->onUpload(function ($files) use ($form, $img) {
+        $control2->onUpload(function ($files) use ($form) {
             if ($files === 'error') {
                 return $form->error('img', 'Error uploading image.');
             }
