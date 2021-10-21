@@ -1,16 +1,16 @@
 <?php
 
 
-namespace atk4\multiupload\Field;
+namespace Atk4\Multiupload\Field;
 
-class File extends \atk4\data\FieldSql
+class File extends \Atk4\Data\FieldSql
 {
-    use \atk4\core\InitializerTrait {
+    use \Atk4\Core\InitializerTrait {
         init as _init;
     }
 
 
-    public $ui = ['form' => [\atk4\multiupload\Form\Control\Upload::class]];
+    public $ui = ['form' => [\Atk4\Multiupload\Form\Control\Upload::class]];
 
     /**
      * Set a custom model for File
@@ -32,30 +32,34 @@ class File extends \atk4\data\FieldSql
     public $fieldURL;
 
 
-    public function init(): void
+    protected function init(): void
+
     {
         $this->_init();
-
+        
         if (!$this->model) {
-            $this->model = new \atk4\filestore\Model\File($this->owner->persistence);
+            $this->model = new \Atk4\Filestore\Model\File($this->getOwner()->persistence);
             $this->model->flysystem = $this->flysystem;
         }
-
+        
         $this->normalizedField = preg_replace('/_id$/', '', $this->short_name);
         
-        $this->reference = $this->owner->addRef($this->short_name, function($m, $c, $d) {
+        $this->reference = $this->getOwner()->addRef($this->short_name, ['model' => function($m, $c, $d) {
+
             $archive = $this->model->newInstance();
             
             // only show records of currently loaded record
             if ($m->loaded()) {
                 $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($m->get($this->short_name) ?? 'notavailable')."')>0"));
-            } elseif ($_REQUEST['mid']) { 
+
+            } elseif (array_key_exists('mid', $_REQUEST)) {
                 // Very bad workaround as the parent model id cannot be found in the variables - $m is not loaded for VirtualPage modals yet, but it is in the $_REQUEST.
-                 
+                
                 $mcloned = (clone $this->owner);
                 $mcloned->load($_REQUEST['mid']);
+                
+                if ($mcloned->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($mcloned->get($this->short_name) ?? 'notavailable')."')>0"));
 
-                if ($mcloned->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($mcloned->get($this->short_name) ?? 'notavailable')."')>0")); 
                 } else {
                     $archive->setLimit(20);
                 }
@@ -64,11 +68,11 @@ class File extends \atk4\data\FieldSql
             }
             
             return $archive;
-        });
+        }]);
         
       //  $this->importFields();
 
-        $this->owner->onHook(\atk4\data\Model::HOOK_BEFORE_SAVE, function($m) {
+        $this->getOwner()->onHook(\Atk4\Data\Model::HOOK_BEFORE_SAVE, function($m) {
             if ($m->isDirty($this->short_name)) {
                 $oldtokens = $m->dirty[$this->short_name];
                 $newtokens = $m->get($this->short_name);
@@ -90,7 +94,7 @@ class File extends \atk4\data\FieldSql
                 }
             }
         });
-            $this->owner->onHook(\atk4\data\Model::HOOK_BEFORE_DELETE, function($m) {
+            $this->getOwner()->onHook(\Atk4\Data\Model::HOOK_BEFORE_DELETE, function($m) {
             $tokens = $m->get($this->short_name);
             if ($tokens) {
                 foreach (explode(',', $tokens) as $token) {
@@ -115,16 +119,17 @@ class File extends \atk4\data\FieldSql
     {
         return parent::normalize($value);
     }
-    
-/**
- * Idea: update model to reflect current tokens, but not called at init...
- * 
-    public function set($value): self
-    {
-        $this->owner->set($this->short_name, $value);
-        $this->model->addCondition($this->model->expr("FIND_IN_SET(token,'".($value) ?? 'notavailable')."')>0"));
-        
-        return $this;
-    }
+
+    /**
+     * Idea: update model to reflect current tokens, but not called at init...
+     *
+     public function set($value): self
+     {
+     $this->owner->set($this->short_name, $value);
+     $this->model->addCondition($this->model->expr("FIND_IN_SET(token,'".($value) ?? 'notavailable')."')>0"));
+     
+     return $this;
+     }
+
      */
 }

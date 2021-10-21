@@ -2,56 +2,56 @@
 
 declare(strict_types=1);
 
-namespace atk4\multiupload;
+namespace Atk4\Multiupload;
 
-use atk4\ui\Form;
+use Atk4\Ui\Form;
 
-/** @var \atk4\ui\App $app */
+/** @var \Atk4\Ui\App $app */
 
 include '../vendor/autoload.php';
 
-$app = new \atk4\ui\App('centered', false, true);
-$app->initLayout([\atk4\ui\Layout\Centered::class]);
+$app = new \Atk4\Ui\App('centered', false, true);
+$app->initLayout([\Atk4\Ui\Layout\Centered::class]);
 
-class PersistenceSql extends \atk4\data\Persistence\Sql
+class PersistenceSql extends \Atk4\Data\Persistence\Sql
 {
     use \atk4\core\AppScopeTrait;
 }
 
 // change this as needed
-$app->db = $app->add(new \atk4\multiupload\PersistenceSql('mysql://root:root@localhost/atk4'));
+$app->db = new \atk4\multiupload\PersistenceSql('mysql://root:root@localhost/atk4');
+$app->db->setApp($app);
 
-$adapter = new \League\Flysystem\Adapter\Local(__DIR__.'/localfiles');
+$adapter = new \League\Flysystem\Local\LocalFilesystemAdapter(__DIR__.'/localfiles');
 $app->filesystem = new \League\Flysystem\Filesystem($adapter);
 
 
 
-class Friend extends \atk4\data\Model {
-    
-    use \atk4\core\AppScopeTrait;
-    
+class Friend extends \Atk4\Data\Model {
+        
     public $table = 'friend';
     
-    function init() : void {
+    protected function init() : void {
         parent::init();
         
         $this->addField('name'); // friend's name
-        $this->addField('file', new \atk4\multiupload\Field\File($this->app->filesystem)); // storing file here
+        $this->addField('file', new \Atk4\Multiupload\Field\File($this->persistence->getApp()->filesystem)); // storing file here
         
     }
 }
 
 $form = Form::addTo($app);
+$model = new Friend($app->db);
+$entity = $model->tryLoad(7);
+$form->setModel($entity);
 
-$form->setModel(new Friend($app->db));
-$form->model->tryLoad(7);
 
-$gr = $app->add([\atk4\ui\Grid::class, 'menu'=>false, 'paginator'=>false]);
-$gr->setModel(new \atk4\filestore\Model\File($app->db));
-//$app->Js(true, new \atk4\ui\jsExpression('setInterval(function() { []; }, 5000)', [$gr->jsReload()]));
+$gr = $app->add([\Atk4\Ui\Grid::class, 'menu'=>false, 'paginator'=>false]);
+$gr->setModel(new \Atk4\Filestore\Model\File($app->db));
+//$app->Js(true, new \Atk4\Ui\jsExpression('setInterval(function() { []; }, 5000)', [$gr->jsReload()]));
 
 //$app->add(['ui'=>'divider']);
 
-\atk4\ui\Crud::addTo($app)->setModel(new Friend($app->db));
+\Atk4\Ui\Crud::addTo($app)->setModel(new Friend($app->db));
 
 
