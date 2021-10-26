@@ -44,6 +44,9 @@ $form = Form::addTo($app);
 $model = new Friend($app->db);
 $entity = $model->tryLoad(7);
 $form->setModel($entity);
+$form->onSubmit(function($form)  {
+    $form->model->save(); 
+});
 
 
 $gr = $app->add([\Atk4\Ui\Grid::class, 'menu'=>false, 'paginator'=>false]);

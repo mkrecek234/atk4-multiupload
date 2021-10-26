@@ -46,7 +46,11 @@ class File extends \Atk4\Data\FieldSql
         $this->normalizedField = preg_replace('/_id$/', '', $this->short_name);
         
         $this->reference = $this->getOwner()->addRef($this->short_name, ['model' => function($m, $c, $d) {
-            $archive = $this->model->newInstance();
+            $archive = new $this->model($this->model->persistence);
+            error_log('var request:'.print_r($_REQUEST, true));
+            error_log('var model:'.print_r($m, true));
+           // error_log('var c:'.$c);
+          //  error_log('var d:'.print_r($d, true));
             
             // only show records of currently loaded record
             if ($m->loaded()) {

@@ -210,7 +210,7 @@ export default class multifileUpload extends atkPlugin {
     multiuploadService.multiuploadFiles(
       file,
       this.$el,
-      {action: 'upload'},
+      {f_upload_action: 'upload'},
       this.settings.uri,
       completeCb,
       xhrCb
@@ -229,7 +229,7 @@ export default class multifileUpload extends atkPlugin {
     this.$el.api({
       on: 'now',
       url: this.settings.uri,
-      data: {'action': 'delete', 'f_name': fileName},
+      data: {f_upload_action: 'delete', 'f_name': fileName},
       method: 'POST',
       obj: this.$el,
       onComplete: function(response, content) {
@@ -252,7 +252,7 @@ export default class multifileUpload extends atkPlugin {
     this.$el.api({
       on: 'now',
       url: this.settings.uri,
-      data: {'action': 'download', 'f_name': fileName},
+      data: {f_upload_action: 'download', 'f_name': fileName},
       method: 'POST',
       obj: this.$el,
       onComplete: function(response, content) {

@@ -185,20 +185,22 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
      */
     public function onDelete(\Closure $fx)
     {
-       
+        error_log('fx'.print_r($fx,true));
+        error_log('POST'.print_r($_POST,true));
+        
         $this->hasDeleteCb = true;
         if (($_POST['f_upload_action'] ?? null) === self::DELETE_ACTION) {
             $this->cb->set(function () use ($fx) {
-                $fileId = $_POST['f_upload_id'] ?? null;
-          /*      $fileName = $_POST['f_name'] ?? null; 
-           *        $this->addJsAction($fx($fileName));
-           *        vorher: $this->addJsAction(call_user_func_array($fx, [$fileName]));
+          /*      $fileId = $_POST['f_upload_id'] ?? null; */
+                $fileName = $_POST['f_name'] ?? null; 
+                $this->addJsAction($fx($fileName));
+          /*        vorher: $this->addJsAction(call_user_func_array($fx, [$fileName]));
 
            *        
-           */
-                $this->addJsAction($fx($fileId));
-                
-                return $this->jsActions;
+           *
+                $this->addJsAction($fx($fileId)); 
+                */
+                return $this->jsActions; 
             });
         
         }
@@ -256,18 +258,20 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
      */
     public function onDownload($fx = null)
     {
+        error_log('fx'.print_r($fx,true));
+        error_log('POST'.print_r($_POST,true));
         
         $this->hasDeleteCb = true;
         if (($_POST['f_upload_action'] ?? null) === self::DOWNLOAD_ACTION) {
             $this->cb->set(function () use ($fx) {
                 $fileId = $_POST['f_upload_id'] ?? null;
-                /*      $fileName = $_POST['f_name'] ?? null;
-                 *        $this->addJsAction($fx($fileName));
-                 *        vorher: $this->addJsAction(call_user_func_array($fx, [$fileName]));
+                     $fileName = $_POST['f_name'] ?? null;
+                        $this->addJsAction($fx($fileName));
+                 /*        vorher: $this->addJsAction(call_user_func_array($fx, [$fileName]));
                  
                  *
-                 */
-                $this->addJsAction($fx($fileId));
+                 *
+                $this->addJsAction($fx($fileId)); */
                 
                 return $this->jsActions;
             });

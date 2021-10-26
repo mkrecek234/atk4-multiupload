@@ -31,7 +31,7 @@ class Upload extends \Atk4\Multiupload\MultiUpload
 
         // add (or upload) the file
         $stream = fopen($file['tmp_name'], 'r+');
-        $this->field->flysystem->writeStream($f->get('location'), $stream, ['visibility'=>'public']);
+        $this->field->flysystem->writeStream($entity->get('location'), $stream, ['visibility'=>'public']);
         if (is_resource($stream)) {
             fclose($stream);
         }
@@ -61,7 +61,7 @@ class Upload extends \Atk4\Multiupload\MultiUpload
     }
 
     public  function deleted($token)
-    {
+    {   error_log('delete'.$token);
         $f = $this->field->model;
         $entity = $f->tryLoadBy('token', $token);
 
