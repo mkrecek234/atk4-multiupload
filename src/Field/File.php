@@ -16,24 +16,35 @@ class File extends \Atk4\Data\FieldSql
     /**
      * Set a custom model for File
      */
-    public $model = null;
+    public $model;
 
     /**
      * Will contain path of the file while it's stored locally
      *
      * @var string
      */
-    public $localField = null;
+    public $localField;
 
-    public $flysystem = null;
+    public $flysystem;
 
-    public $normalizedField = null;
+    public $normalizedField;
 
-    public $referenceModel;
+    public $referenceLink;
 
     public $fieldFilename;
     public $fieldURL;
 
+    public function __construct(\League\Flysystem\Filesystem $flysystem)
+    {
+        parent::__construct([]);
+        $this->flysystem = $flysystem;
+    }
+    
+    public function normalize($value)
+    {
+        return parent::normalize($value);
+    }
+    
     protected function init(): void
     {
         $this->_init();
@@ -44,13 +55,8 @@ class File extends \Atk4\Data\FieldSql
         }
         
         $this->normalizedField = preg_replace('/_id$/', '', $this->short_name);
-        
-        $this->reference = $this->getOwner()->addRef($this->short_name, ['model' => function($m, $c, $d) {
+        $this->referenceLink = $this->getOwner()->addRef($this->short_name, ['model' => function($m) {
             $archive = new $this->model($this->model->persistence);
-            error_log('var request:'.print_r($_REQUEST, true));
-            error_log('var model:'.print_r($m, true));
-           // error_log('var c:'.$c);
-          //  error_log('var d:'.print_r($d, true));
             
             // only show records of currently loaded record
             if ($m->loaded()) {
@@ -70,9 +76,9 @@ class File extends \Atk4\Data\FieldSql
             }
             
             return $archive;
-        }]);
+        }])->link;
         
-     //   $this->importFields();
+        //$this->importFields();
 
         $this->getOwner()->onHook(\Atk4\Data\Model::HOOK_BEFORE_SAVE, function($m) {
             if ($m->isDirty($this->short_name)) {
@@ -113,14 +119,6 @@ class File extends \Atk4\Data\FieldSql
         $this->fieldFilename = $this->model->addExpression($this->normalizedField.'_filename', 'group_concat(meta_filename)');
     }
 
-    function __construct(\League\Flysystem\Filesystem $flysystem) {
-        $this->flysystem = $flysystem;
-    }
-
-    public function normalize($value)
-    {
-        return parent::normalize($value);
-    }
     /**
      * Idea: update model to reflect current tokens, but not called at init...
      *

@@ -19,7 +19,7 @@ class PersistenceSql extends \Atk4\Data\Persistence\Sql
 }
 
 // change this as needed
-$app->db = new \atk4\multiupload\PersistenceSql('mysql://root:root@localhost/atk4');
+$app->db = new \Atk4\Multiupload\PersistenceSql('mysql://root:root@localhost/atk4');
 $app->db->setApp($app);
 
 $adapter = new \League\Flysystem\Local\LocalFilesystemAdapter(__DIR__.'/localfiles');
