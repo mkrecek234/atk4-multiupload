@@ -239,15 +239,10 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
         $this->hasDeleteCb = true;
         if (($_POST['f_upload_action'] ?? null) === self::DELETE_ACTION) {
             $this->cb->set(function () use ($fx) {
-          /*      $fileId = $_POST['f_upload_id'] ?? null; */
+
                 $fileName = $_POST['f_name'] ?? null; 
                 $this->addJsAction($fx($fileName));
-          /*        vorher: $this->addJsAction(call_user_func_array($fx, [$fileName]));
 
-           *        
-           *
-                $this->addJsAction($fx($fileId)); 
-                */
                 return $this->jsActions; 
             });
         
@@ -268,14 +263,9 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
         $this->hasDeleteCb = true;
         if (($_POST['f_upload_action'] ?? null) === self::DOWNLOAD_ACTION) {
             $this->cb->set(function () use ($fx) {
-                $fileId = $_POST['f_upload_id'] ?? null;
-                     $fileName = $_POST['f_name'] ?? null;
-                        $this->addJsAction($fx($fileName));
-                 /*        vorher: $this->addJsAction(call_user_func_array($fx, [$fileName]));
-                 
-                 *
-                 *
-                $this->addJsAction($fx($fileId)); */
+                
+                $fileName = $_POST['f_name'] ?? null;
+                $this->addJsAction($fx($fileName));
                 
                 return $this->jsActions;
             });

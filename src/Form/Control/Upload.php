@@ -15,7 +15,7 @@ class Upload extends \Atk4\Multiupload\MultiUpload
         $this->onDownload(\Closure::fromCallable([$this, 'downloaded']));
         
         $this->renderRowFunction = function(\Atk4\Filestore\Model\File $row) {
-            error_log('Called'.print_r($row, true));
+
             return [
                 'value' => $row->get('token'),
                 'title' => $row->get('meta_filename')
