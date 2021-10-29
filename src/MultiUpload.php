@@ -203,22 +203,24 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
                 $postFiles[] = $postFile;
             }
             
+            foreach ($postFiles as $postFile) {
+                
             if (count($postFiles) > 0) {
-                $fileId = reset($postFiles)['name'];
+                $fileId = $postFile['name'];
                 $this->setFileId($fileId);
                 $this->setInput($fileId);
             }
             
-            $this->addJsAction($fx(...$postFiles));
+            $this->addJsAction($fx($postFile));
             
             if (count($postFiles) > 0 && reset($postFiles)['error'] === 0) {
-                foreach ($postFiles as $postFile) {
-                 
+
                 $this->addJsAction([
                     $this->js()->atkmultiFileUpload('updateField', [$this->fileId, $postFile['name']]),
                 ]);
                 }
             }
+        
             
             return $this->jsActions;
         });

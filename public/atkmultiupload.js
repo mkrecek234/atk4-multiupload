@@ -17364,11 +17364,11 @@ class multifileUpload extends _atk_plugin__WEBPACK_IMPORTED_MODULE_1__["default"
     }); // Add click events for items.
 
     this.$el.on('click', '> .label > .filetitle', e => {
-      let id = jquery__WEBPACK_IMPORTED_MODULE_0___default()(this).parent().data('value');
+      let id = jquery__WEBPACK_IMPORTED_MODULE_0___default()(event.target).parent().data('value');
       that.doFileDownload(id);
     });
     this.$el.on('click', '> .label > .delete.icon', e => {
-      let id = jquery__WEBPACK_IMPORTED_MODULE_0___default()(this).parent().data('value');
+      let id = jquery__WEBPACK_IMPORTED_MODULE_0___default()(event.target).parent().data('value');
       that.doFileDelete(id);
     }); // add event handler to file input.
 

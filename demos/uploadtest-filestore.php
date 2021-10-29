@@ -42,7 +42,7 @@ class Friend extends \Atk4\Data\Model {
 
 $form = Form::addTo($app);
 $model = new Friend($app->db);
-$entity = $model->tryLoad(7);
+$entity = $model->tryLoad(1);
 $form->setModel($entity);
 $form->onSubmit(function($form)  {
     $form->model->save(); 

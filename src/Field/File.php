@@ -89,7 +89,7 @@ class File extends \Atk4\Data\FieldSql
                 if($oldtokens) {
                     foreach (explode(',', $oldtokens) as $oldtoken) {
                         if (!in_array($oldtoken, explode(',', $newtokens))) {
-                          $m->refModel($this->short_name)->loadBy('token', $oldtoken)->delete();
+                           $this->model->loadBy('token', $oldtoken)->delete();
                         }
                     }
                 }
