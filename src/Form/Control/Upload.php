@@ -14,10 +14,11 @@ class Upload extends \Atk4\Multiupload\MultiUpload
         $this->onDelete(\Closure::fromCallable([$this, 'deleted']));
         $this->onDownload(\Closure::fromCallable([$this, 'downloaded']));
         
-        $this->renderRowFunction = function($record) {
+        $this->renderRowFunction = function(\Atk4\Filestore\Model\File $row) {
+
             return [
-                'value' => $record->get('token'),
-                'title' => $record->get('meta_filename')
+                'value' => $row->get('token'),
+                'title' => $row->get('meta_filename')
             ];
         };
 
@@ -32,7 +33,7 @@ class Upload extends \Atk4\Multiupload\MultiUpload
 
         // add (or upload) the file
         $stream = fopen($file['tmp_name'], 'r+');
-        $this->field->flysystem->writeStream($f->get('location'), $stream, ['visibility'=>'public']);
+        $this->field->flysystem->writeStream($entity->get('location'), $stream, ['visibility'=>'public']);
         if (is_resource($stream)) {
             fclose($stream);
         }
@@ -63,7 +64,7 @@ class Upload extends \Atk4\Multiupload\MultiUpload
     }
 
     public  function deleted($token)
-    {
+    {  
         $f = $this->field->model;
         $entity = $f->tryLoadBy('token', $token);
 

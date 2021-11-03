@@ -85,7 +85,7 @@ export default class multifileUpload extends atkPlugin {
   setEventHandler() {
     const that = this;
 
-    this.textInput.on('click', function(e) {
+    this.textInput.on('click', (e) => {
       if (!e.target.value) {
         that.fileInput.click();
       }
@@ -94,7 +94,7 @@ export default class multifileUpload extends atkPlugin {
     
 
     // add event handler to action button.
-    this.action.on('click', function(e) {
+    this.action.on('click', (e) => {
       if (!that.textInput.val()) {
         that.fileInput.click();
       } else {
@@ -111,7 +111,7 @@ export default class multifileUpload extends atkPlugin {
       }
     });
 
- this.uploadicon.on('click', function(e) {
+ this.uploadicon.on('click', (e) => {
       if (!that.textInput.val()) {
         that.fileInput.click();
       } else {
@@ -129,18 +129,18 @@ export default class multifileUpload extends atkPlugin {
     
 	// Add click events for items.
 	
-	this.$el.on('click', '> .label > .filetitle', function(e) {
-	  let id = $(this).parent().data('value');  
+	this.$el.on('click', '> .label > .filetitle', (e) => {
+	  let id = $(event.target).parent().data('value'); 
       that.doFileDownload(id);
     });
     
-  	this.$el.on('click', '> .label > .delete.icon', function(e) {
-  	  let id = $(this).parent().data('value');  
+  	this.$el.on('click', '> .label > .delete.icon', (e) => {
+  	  let id = $(event.target).parent().data('value'); 
   	  that.doFileDelete(id);
     }); 
 
     // add event handler to file input.
-    this.fileInput.on('change', function(e) {
+    this.fileInput.on('change', (e) => {
       if (e.target.files.length > 0) {
         that.textInput.val( e.target.files[0].name);
         //that.doFileUpload(e.target.files[0]);
@@ -159,7 +159,7 @@ export default class multifileUpload extends atkPlugin {
     switch (mode) {
       case 'added':
         //this.action.html(this.getEraseContent);
-        setTimeout(function() {
+        setTimeout(() => {
           that.bar.progress('reset');
           that.bar.hide('fade');
         }, 1000);
@@ -183,7 +183,7 @@ export default class multifileUpload extends atkPlugin {
     }
 
     // setup task on upload completion.
-    let completeCb =  function(response, content) {
+    let completeCb =  (response, content) => {
       if (response.success) {
         that.bar.progress('set label', that.settings.completeLabel);
          that.setState('added');
@@ -195,9 +195,9 @@ export default class multifileUpload extends atkPlugin {
     };
 
     // setup progress bar update via xhr.
-    let xhrCb = function() {
+    let xhrCb = () => {
       let xhr = new window.XMLHttpRequest();
-      xhr.upload.addEventListener("progress", function (evt) {
+      xhr.upload.addEventListener("progress",  (evt) => {
         if (evt.lengthComputable) {
           let percentComplete = evt.loaded / evt.total;
           that.bar.progress('set percent', parseInt(percentComplete * 100));
@@ -210,7 +210,7 @@ export default class multifileUpload extends atkPlugin {
     multiuploadService.multiuploadFiles(
       file,
       this.$el,
-      {action: 'upload'},
+      {f_upload_action: 'upload'},
       this.settings.uri,
       completeCb,
       xhrCb
@@ -229,10 +229,10 @@ export default class multifileUpload extends atkPlugin {
     this.$el.api({
       on: 'now',
       url: this.settings.uri,
-      data: {'action': 'delete', 'f_name': fileName},
+      data: {f_upload_action: 'delete', 'f_name': fileName},
       method: 'POST',
       obj: this.$el,
-      onComplete: function(response, content) {
+      onComplete: (response, content) => {
         if (response.success) {
         //  that.setState('upload');
         }
@@ -252,10 +252,10 @@ export default class multifileUpload extends atkPlugin {
     this.$el.api({
       on: 'now',
       url: this.settings.uri,
-      data: {'action': 'download', 'f_name': fileName},
+      data: {f_upload_action: 'download', 'f_name': fileName},
       method: 'POST',
       obj: this.$el,
-      onComplete: function(response, content) {
+      onComplete: (response, content) => {
         if (response.success) {
         //  that.setState('upload');
         }

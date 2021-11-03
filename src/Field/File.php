@@ -1,5 +1,6 @@
 <?php
 
+// vim:ts=4:sw=4:et:fdm=marker:fdl=0
 
 namespace Atk4\Multiupload\Field;
 
@@ -15,25 +16,36 @@ class File extends \Atk4\Data\FieldSql
     /**
      * Set a custom model for File
      */
-    public $model = null;
+    public $model;
 
     /**
      * Will contain path of the file while it's stored locally
      *
      * @var string
      */
-    public $localField = null;
+    public $localField;
 
-    public $flysystem = null;
+    public $flysystem;
 
-    public $normalizedField = null;
+    public $normalizedField;
+
+    public $referenceLink;
 
     public $fieldFilename;
     public $fieldURL;
 
-
+    public function __construct(\League\Flysystem\Filesystem $flysystem)
+    {
+        parent::__construct([]);
+        $this->flysystem = $flysystem;
+    }
+    
+    public function normalize($value)
+    {
+        return parent::normalize($value);
+    }
+    
     protected function init(): void
-
     {
         $this->_init();
         
@@ -43,15 +55,12 @@ class File extends \Atk4\Data\FieldSql
         }
         
         $this->normalizedField = preg_replace('/_id$/', '', $this->short_name);
-        
-        $this->reference = $this->getOwner()->addRef($this->short_name, ['model' => function($m, $c, $d) {
-
-            $archive = $this->model->newInstance();
+        $this->referenceLink = $this->getOwner()->addRef($this->short_name, ['model' => function($m) {
+            $archive = new $this->model($this->model->persistence);
             
             // only show records of currently loaded record
             if ($m->loaded()) {
                 $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($m->get($this->short_name) ?? 'notavailable')."')>0"));
-
             } elseif (array_key_exists('mid', $_REQUEST)) {
                 // Very bad workaround as the parent model id cannot be found in the variables - $m is not loaded for VirtualPage modals yet, but it is in the $_REQUEST.
                 
@@ -59,7 +68,6 @@ class File extends \Atk4\Data\FieldSql
                 $mcloned->load($_REQUEST['mid']);
                 
                 if ($mcloned->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($mcloned->get($this->short_name) ?? 'notavailable')."')>0"));
-
                 } else {
                     $archive->setLimit(20);
                 }
@@ -68,9 +76,9 @@ class File extends \Atk4\Data\FieldSql
             }
             
             return $archive;
-        }]);
+        }])->link;
         
-      //  $this->importFields();
+        //$this->importFields();
 
         $this->getOwner()->onHook(\Atk4\Data\Model::HOOK_BEFORE_SAVE, function($m) {
             if ($m->isDirty($this->short_name)) {
@@ -81,7 +89,7 @@ class File extends \Atk4\Data\FieldSql
                 if($oldtokens) {
                     foreach (explode(',', $oldtokens) as $oldtoken) {
                         if (!in_array($oldtoken, explode(',', $newtokens))) {
-                          $m->refModel($this->short_name)->loadBy('token', $oldtoken)->delete();
+                           $this->model->loadBy('token', $oldtoken)->delete();
                         }
                     }
                 }
@@ -111,15 +119,6 @@ class File extends \Atk4\Data\FieldSql
         $this->fieldFilename = $this->model->addExpression($this->normalizedField.'_filename', 'group_concat(meta_filename)');
     }
 
-    function __construct(\League\Flysystem\Filesystem $flysystem) {
-        $this->flysystem = $flysystem;
-    }
-
-    public function normalize($value)
-    {
-        return parent::normalize($value);
-    }
-
     /**
      * Idea: update model to reflect current tokens, but not called at init...
      *
@@ -130,6 +129,5 @@ class File extends \Atk4\Data\FieldSql
      
      return $this;
      }
-
      */
 }

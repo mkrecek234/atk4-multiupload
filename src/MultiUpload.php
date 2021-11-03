@@ -176,6 +176,56 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
             $this->jsActions[] = $action;
         }
     }
+    
+    /**
+     * onUpload callback.
+     * Call when user is uploading a file.
+     *
+     * @param callable $fx
+     */
+    public function onUpload(\Closure $fx)
+    {   $this->hasUploadCb = true;
+    if (($_POST['f_upload_action'] ?? null) === self::UPLOAD_ACTION) {
+        $this->cb->set(function () use ($fx) {
+            $postFiles = [];
+            
+            for ($i = 0;; ++$i) {
+                $k = 'file' . ($i > 0 ? '-' . $i : '');
+                if (!isset($_FILES[$k])) {
+                    break;
+                }
+                
+                $postFile = $_FILES[$k];
+                if ($postFile['error'] !== 0) {
+                    // unset all details on upload error
+                    $postFile = array_intersect_key($postFile, array_flip(['error', 'name']));
+                }
+                $postFiles[] = $postFile;
+            }
+            
+            foreach ($postFiles as $postFile) {
+                
+            if (count($postFiles) > 0) {
+                $fileId = $postFile['name'];
+                $this->setFileId($fileId);
+                $this->setInput($fileId);
+            }
+            
+            $this->addJsAction($fx($postFile));
+            
+            if (count($postFiles) > 0 && reset($postFiles)['error'] === 0) {
+
+                $this->addJsAction([
+                    $this->js()->atkmultiFileUpload('updateField', [$this->fileId, $postFile['name']]),
+                ]);
+                }
+            }
+        
+            
+            return $this->jsActions;
+        });
+    }
+    }
 
     /**
      * onDelete callback.
@@ -185,68 +235,21 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
      */
     public function onDelete(\Closure $fx)
     {
-       
+
         $this->hasDeleteCb = true;
         if (($_POST['f_upload_action'] ?? null) === self::DELETE_ACTION) {
             $this->cb->set(function () use ($fx) {
-                $fileId = $_POST['f_upload_id'] ?? null;
-          /*      $fileName = $_POST['f_name'] ?? null; 
-           *        $this->addJsAction($fx($fileName));
-           *        vorher: $this->addJsAction(call_user_func_array($fx, [$fileName]));
 
-           *        
-           */
-                $this->addJsAction($fx($fileId));
-                
-                return $this->jsActions;
+                $fileName = $_POST['f_name'] ?? null; 
+                $this->addJsAction($fx($fileName));
+
+                return $this->jsActions; 
             });
         
         }
     }
 
-    /**
-     * onUpload callback.
-     * Call when user is uploading a file.
-     *
-     * @param callable $fx
-     */
-    public function onUpload(\Closure $fx)
-    {   $this->hasUploadCb = true;
-        if (($_POST['f_upload_action'] ?? null) === self::UPLOAD_ACTION) {
-            $this->cb->set(function () use ($fx) {
-                $postFiles = [];
-                for ($i = 0;; ++$i) {
-                    $k = 'file' . ($i > 0 ? '-' . $i : '');
-                    if (!isset($_FILES[$k])) {
-                        break;
-                    }
-
-                    $postFile = $_FILES[$k];
-                    if ($postFile['error'] !== 0) {
-                        // unset all details on upload error
-                        $postFile = array_intersect_key($postFile, array_flip(['error', 'name']));
-                    }
-                    $postFiles[] = $postFile;
-                }
-
-                if (count($postFiles) > 0) {
-                    $fileId = reset($postFiles)['name'];
-                    $this->setFileId($fileId);
-                    $this->setInput($fileId);
-                }
-
-                $this->addJsAction($fx(...$postFiles));
-
-                if (count($postFiles) > 0 && reset($postFiles)['error'] === 0) {
-                    $this->addJsAction([
-                        $this->js()->atkFileUpload('updateField', [$this->fileId, $this->getInputValue()]),
-                    ]);
-                }
-
-                return $this->jsActions;
-            });
-        }
-    }
+   
     
     /**
      * onDelete callback.
@@ -260,14 +263,9 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
         $this->hasDeleteCb = true;
         if (($_POST['f_upload_action'] ?? null) === self::DOWNLOAD_ACTION) {
             $this->cb->set(function () use ($fx) {
-                $fileId = $_POST['f_upload_id'] ?? null;
-                /*      $fileName = $_POST['f_name'] ?? null;
-                 *        $this->addJsAction($fx($fileName));
-                 *        vorher: $this->addJsAction(call_user_func_array($fx, [$fileName]));
-                 
-                 *
-                 */
-                $this->addJsAction($fx($fileId));
+                
+                $fileName = $_POST['f_name'] ?? null;
+                $this->addJsAction($fx($fileName));
                 
                 return $this->jsActions;
             });

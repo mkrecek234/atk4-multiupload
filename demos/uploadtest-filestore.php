@@ -19,7 +19,7 @@ class PersistenceSql extends \Atk4\Data\Persistence\Sql
 }
 
 // change this as needed
-$app->db = new \atk4\multiupload\PersistenceSql('mysql://root:root@localhost/atk4');
+$app->db = new \Atk4\Multiupload\PersistenceSql('mysql://root:root@localhost/atk4');
 $app->db->setApp($app);
 
 $adapter = new \League\Flysystem\Local\LocalFilesystemAdapter(__DIR__.'/localfiles');
@@ -42,8 +42,11 @@ class Friend extends \Atk4\Data\Model {
 
 $form = Form::addTo($app);
 $model = new Friend($app->db);
-$entity = $model->tryLoad(7);
+$entity = $model->tryLoad(1);
 $form->setModel($entity);
+$form->onSubmit(function($form)  {
+    $form->model->save(); 
+});
 
 
 $gr = $app->add([\Atk4\Ui\Grid::class, 'menu'=>false, 'paginator'=>false]);
