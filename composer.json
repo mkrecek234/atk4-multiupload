@@ -19,11 +19,7 @@
 			"homepage" : "http://www.krecek.net"
 		}
 	],
-	"repositories" : [{
-			"type" : "vcs",
-			"url" : "https://github.com/mkrecek234/filestore"
-		}
-	],
+
 	"require" : {
 		"atk4/ui" : "*",
 		"php" : ">=7.0.0",

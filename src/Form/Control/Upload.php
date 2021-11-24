@@ -1,13 +1,23 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Atk4\Multiupload\Form\Control;
+
+use Atk4\Filestore\Field\FileField;
+use League\MimeTypeDetection\FinfoMimeTypeDetector;
 
 class Upload extends \Atk4\Multiupload\MultiUpload 
 {
 
     public $model = null; // File model
     
+    /** @var EntityFieldPair<\Atk4\Filestore\Model\File, File> */
+    public $entityField;
+    
 
   protected function init(): void {
+       
         parent::init();
 
         $this->onUpload(\Closure::fromCallable([$this, 'uploaded']));
@@ -28,34 +38,34 @@ class Upload extends \Atk4\Multiupload\MultiUpload
     public function uploaded($file)
     {
         // provision a new file for specified flysystem
-        $f = $this->field->model;
-        $entity = $f->newFile($this->field->flysystem);
-
+        $model = $this->entityField->getField()->fileModel;
+        $entity = $model->newFile();
+        
         // add (or upload) the file
         $stream = fopen($file['tmp_name'], 'r+');
-        $this->field->flysystem->writeStream($entity->get('location'), $stream, ['visibility'=>'public']);
+        $this->entityField->getField()->flysystem->writeStream($entity->get('location'), $stream, ['visibility' => 'public']);
         if (is_resource($stream)) {
             fclose($stream);
         }
-
+        
+        $detector = new \League\MimeTypeDetection\FinfoMimeTypeDetector();
+        
+        $mimeType = $detector->detectMimeTypeFromFile($file['tmp_name']);
         // get meta from browser
-        $entity->set('meta_mime_type', $file['type']);
-
+        $entity->set('meta_mime_type', $file['type']); //$mimeType caused issue doubling identifier name on Excel docs....
+        
         // store meta-information
-        $is = getimagesize($file['tmp_name']);
-
-        $entity->set('meta_is_image', (bool) $is);
-        if ($is){
-            $entity->set('meta_mime_type', $is['mime']);
-            $entity->set('meta_image_width', $is[0]);
-            $entity->set('meta_image_height', $is[1]);
-            //$m['extension'] = $is['mime'];
+        $imageSizeArr = getimagesize($file['tmp_name']);
+        $entity->set('meta_is_image', $imageSizeArr !== false);
+        if ($imageSizeArr !== false) {
+            $entity->set('meta_image_width', $imageSizeArr[0]);
+            $entity->set('meta_image_height', $imageSizeArr[1]);
         }
-        $entity->set('meta_md5',md5_file($file['tmp_name']));
+        
+        $entity->set('meta_md5', md5_file($file['tmp_name']));
         $entity->set('meta_filename', $file['name']);
         $entity->set('meta_size', $file['size']);
-
-
+        
         $entity->save();
         $this->setFileId($entity->get('token'));
         
@@ -65,11 +75,11 @@ class Upload extends \Atk4\Multiupload\MultiUpload
 
     public  function deleted($token)
     {  
-        $f = $this->field->model;
-        $entity = $f->tryLoadBy('token', $token);
-
+        $model = $this->entityField->getField()->fileModel;
+        $entity = $model->tryLoadBy('token', $token);
+        
         $js =  new \Atk4\Ui\JsNotify(['content' => $entity->get('meta_filename').' has been removed!', 'color' => 'green']);
-        if ($entity->get('status') == 'draft') {
+        if ($entity->loaded() && $entity->get('status') === 'draft') {
             $entity->delete();
         }
 
@@ -77,8 +87,8 @@ class Upload extends \Atk4\Multiupload\MultiUpload
     }
     
     public  function downloaded($token)
-    {   $f = $this->field->model;
-        $entity = $f->tryLoadBy('token', $token);
+    {   $model = $this->entityField->getField()->fileModel;
+        $entity = $model->tryLoadBy('token', $token);
   
         $js = [ new \Atk4\Ui\JsNotify(['content' => $entity->get('meta_filename').' is being downloaded!', 'color' => 'green']),
                 ];
