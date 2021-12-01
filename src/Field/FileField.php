@@ -74,9 +74,9 @@ class FileField extends Field
                 // Very bad workaround as the parent model id cannot be found in the variables - $m is not loaded for VirtualPage modals yet, but it is in the $_REQUEST.
                 
                 $mcloned = (clone $this->getOwner());
-                $mcloned->load($_REQUEST['mid']);
+                $entity = $mcloned->load($_REQUEST['mid']);
                 
-                if ($mcloned->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($mcloned->get($this->short_name) ?? 'notavailable')."')>0"));
+                if ($entity ->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($entity ->get($this->short_name) ?? 'notavailable')."')>0"));
                 } else {
                     $archive->setLimit(20);
                 }
