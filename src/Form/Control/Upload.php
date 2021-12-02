@@ -87,7 +87,8 @@ class Upload extends \Atk4\Multiupload\MultiUpload
     }
     
     public  function downloaded($token)
-    {   $model = $this->model;
+    {   
+        $model = $this->model;
         $entity = $model->tryLoadBy('token', $token);
   
         $js = [ new \Atk4\Ui\JsNotify(['content' => $entity->get('meta_filename').' is being downloaded!', 'color' => 'green']),

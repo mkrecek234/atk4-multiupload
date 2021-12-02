@@ -76,7 +76,7 @@ class FileField extends Field
                 $mcloned = (clone $this->getOwner());
                 $entity = $mcloned->load($_REQUEST['mid']);
                 
-                if ($entity ->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($entity ->get($this->short_name) ?? 'notavailable')."')>0"));
+                if ($entity->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($entity->get($this->short_name) ?? 'notavailable')."')>0"));
                 } else {
                     $archive->setLimit(20);
                 }
@@ -86,7 +86,7 @@ class FileField extends Field
                 $mcloned = (clone $this->getOwner());
                 $entity = $mcloned->load($_REQUEST['tid']);
                 
-                if ($entity ->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($entity ->get($this->short_name) ?? 'notavailable')."')>0"));
+                if ($entity->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($entity->get($this->short_name) ?? 'notavailable')."')>0"));
                 } else {
                     $archive->setLimit(20);
                 }
@@ -107,7 +107,7 @@ class FileField extends Field
                 // remove old file, we don't need it
                 if($oldtokens) {
                     foreach (explode(',', $oldtokens) as $oldtoken) {
-                        if (!in_array($oldtoken, explode(',', $newtokens))) {
+                        if (($newtokens) && (!in_array($oldtoken, explode(',', $newtokens)))) {
                            $this->fileModel->loadBy('token', $oldtoken)->delete();
                         }
                     }
