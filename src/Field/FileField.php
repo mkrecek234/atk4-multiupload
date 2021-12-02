@@ -67,32 +67,22 @@ class FileField extends Field
         $this->referenceLink = $this->getOwner()->addRef($this->short_name, ['model' => function($m) {
         $archive = new $this->fileModel($this->fileModel->persistence);
             
-            // only show records of currently loaded record
-            if ($m->isEntity()) {
-                $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($m->get($this->short_name) ?? 'notavailable')."')>0"));
-            } elseif (array_key_exists('mid', $_REQUEST)) {
-                // Very bad workaround as the parent model id cannot be found in the variables - $m is not loaded for VirtualPage modals yet, but it is in the $_REQUEST.
-                
-                $mcloned = (clone $this->getOwner());
-                $entity = $mcloned->load($_REQUEST['mid']);
-                
-                if ($entity->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($entity->get($this->short_name) ?? 'notavailable')."')>0"));
-                } else {
-                    $archive->setLimit(20);
-                }
-            } elseif (array_key_exists('tid', $_REQUEST)) {
-                // Very bad workaround as the parent model id cannot be found in the variables - $m is not loaded for VirtualPage modals yet, but it is in the $_REQUEST.
-                
-                $mcloned = (clone $this->getOwner());
-                $entity = $mcloned->load($_REQUEST['tid']);
-                
-                if ($entity->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($entity->get($this->short_name) ?? 'notavailable')."')>0"));
-                } else {
-                    $archive->setLimit(20);
-                }
+        // only show records of currently loaded record
+        if (!($GLOBALS['model'] === $m) && array_key_exists('mid', $_REQUEST)) {
+            // Very bad workaround as the parent model id cannot be found in the variables - $m is not loaded for VirtualPage modals yet, but it is in the $_REQUEST.
+            
+            $mcloned = (clone $this->getOwner());
+            $entity = $mcloned->load($_REQUEST['mid']);
+            
+            if ($entity->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($entity->get($this->short_name) ?? 'notavailable')."')>0"));
             } else {
                 $archive->setLimit(20);
             }
+        } elseif (($GLOBALS['model'] === $m) && ($GLOBALS['entity']->isEntity())) {
+            $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($GLOBALS['entity']->get($this->short_name) ?? 'notavailable')."')>0"));
+        } else {
+            $archive->setLimit(20);
+        }
             
             return $archive;
         }])->link;
