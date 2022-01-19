@@ -78,7 +78,7 @@ class FileField extends Field
             } else {
                 $archive->setLimit(20);
             }
-        } elseif (($GLOBALS['model'] === $m) && ($GLOBALS['entity']->isEntity())) {
+        } elseif (($GLOBALS['model'] === $m) && array_key_exists('entity', $GLOBALS) && ($GLOBALS['entity']->isEntity())) {
             $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($GLOBALS['entity']->get($this->short_name) ?? 'notavailable')."')>0"));
         } else {
             $archive->setLimit(20);
