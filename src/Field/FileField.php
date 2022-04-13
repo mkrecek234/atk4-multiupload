@@ -60,11 +60,11 @@ class FileField extends Field
             $this->fileModel->flysystem = $this->flysystem;
         }
         
-        $this->fieldNameBase = preg_replace('/_id$/', '', $this->short_name);
+        $this->fieldNameBase = preg_replace('/_id$/', '', $this->shortName);
         
         $this->importFields();
         
-        $this->referenceLink = $this->getOwner()->addRef($this->short_name, ['model' => function($m) {
+        $this->referenceLink = $this->getOwner()->addRef($this->shortName, ['model' => function($m) {
         $archive = new $this->fileModel($this->fileModel->persistence);
             
         // only show records of currently loaded record
@@ -74,12 +74,12 @@ class FileField extends Field
             $mcloned = (clone $this->getOwner());
             $entity = $mcloned->load($_REQUEST['mid']);
             
-            if ($entity->get($this->short_name)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($entity->get($this->short_name) ?? 'notavailable')."')>0"));
+            if ($entity->get($this->shortName)) { $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($entity->get($this->shortName) ?? 'notavailable')."')>0"));
             } else {
                 $archive->setLimit(20);
             }
         } elseif (($GLOBALS['model'] === $m) && array_key_exists('entity', $GLOBALS) && ($GLOBALS['entity']->isEntity())) {
-            $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($GLOBALS['entity']->get($this->short_name) ?? 'notavailable')."')>0"));
+            $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($GLOBALS['entity']->get($this->shortName) ?? 'notavailable')."')>0"));
         } else {
             $archive->setLimit(20);
         }
@@ -90,9 +90,9 @@ class FileField extends Field
         //$this->importFields();
 
         $this->getOwner()->onHook(Model::HOOK_BEFORE_SAVE, function(Model $m) {
-            if ($m->isDirty($this->short_name)) {
-                $oldtokens = $m->getDirtyRef()[$this->short_name];
-                $newtokens = $m->get($this->short_name);
+            if ($m->isDirty($this->shortName)) {
+                $oldtokens = $m->getDirtyRef()[$this->shortName];
+                $newtokens = $m->get($this->shortName);
 
                 // remove old file, we don't need it
                 if($oldtokens) {
@@ -106,17 +106,17 @@ class FileField extends Field
                 // mark new file as linked
                 if($newtokens) {
                     foreach ((array) explode(',', $newtokens) as $newtoken) {
-                    $m->refModel($this->short_name)->loadBy('token', $newtoken)->save(['status'=>'linked']);
+                        $m->refModel($this->shortName)->loadBy('token', $newtoken)->save(['status'=>'linked']);
                     }
                 }
             }
         });
         
             $this->getOwner()->onHook(Model::HOOK_BEFORE_DELETE, function(Model $m) {
-            $tokens = $m->get($this->short_name);
+                $tokens = $m->get($this->shortName);
             if ($tokens) {
                 foreach (explode(',', $tokens) as $token) {
-                $m->refModel($this->short_name)->loadBy('token', $token)->delete();
+                    $m->refModel($this->shortName)->loadBy('token', $token)->delete();
                 }
             }
         });
@@ -134,7 +134,7 @@ class FileField extends Field
      *
      public function set($value): self
      {
-     $this->owner->set($this->short_name, $value);
+     $this->owner->set($this->shortName, $value);
      $this->model->addCondition($this->model->expr("FIND_IN_SET(token,'".($value) ?? 'notavailable')."')>0"));
      
      return $this;
