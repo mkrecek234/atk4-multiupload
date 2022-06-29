@@ -56,7 +56,7 @@ class FileField extends Field
         $this->_init();
         
         if ($this->fileModel === null) {
-            $this->fileModel = new File($this->getOwner()->persistence);
+            $this->fileModel = new File($this->getOwner()->getPersistence());
             $this->fileModel->flysystem = $this->flysystem;
         }
         
@@ -65,7 +65,7 @@ class FileField extends Field
         $this->importFields();
         
         $this->referenceLink = $this->getOwner()->addRef($this->shortName, ['model' => function($m) {
-        $archive = new $this->fileModel($this->fileModel->persistence);
+        $archive = new $this->fileModel($this->fileModel->getPersistence());
             
         // only show records of currently loaded record
         if (!($GLOBALS['model'] === $m) && array_key_exists('mid', $_REQUEST)) {
