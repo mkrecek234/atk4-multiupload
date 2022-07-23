@@ -48,7 +48,7 @@ class FileField extends Field
 
     public $normalizedField;
 
-    public $referenceLink;
+    public ?string $referenceLink;
 
 
     protected function init(): void
@@ -64,7 +64,7 @@ class FileField extends Field
         
         $this->importFields();
         
-        $this->referenceLink = $this->getOwner()->addRef($this->shortName, ['model' => function($m) {
+        $this->referenceLink = $this->getOwner()->addReference($this->shortName, ['model' => function($m) {
         $archive = new $this->fileModel($this->fileModel->getPersistence());
             
         // only show records of currently loaded record
