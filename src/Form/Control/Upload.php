@@ -35,7 +35,7 @@ class Upload extends \Atk4\Multiupload\MultiUpload
     }
     
 
-    public function uploaded($file)
+    protected function uploaded($file)
     {
         // provision a new file for specified flysystem
         $model = $this->entityField->getField()->fileModel;
