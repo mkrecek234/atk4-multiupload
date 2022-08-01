@@ -22,7 +22,7 @@ class FileField extends Field
     }
 
 
-    public $ui = ['form' => [\Atk4\Multiupload\Form\Control\Upload::class]];
+    public array $ui = ['form' => [\Atk4\Multiupload\Form\Control\Upload::class]];
 
     /** @var File|null */
     public $fileModel;
