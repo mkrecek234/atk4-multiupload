@@ -16,7 +16,7 @@ class App extends \Atk4\Ui\App {
 
 
 
-$app = new App('centered', false, true);
+$app = new \Atk4\Multiupload\App(['title' => 'Filestore Demo']);
 $app->initLayout([\Atk4\Ui\Layout\Centered::class]);
 
 class PersistenceSql extends \Atk4\Data\Persistence\Sql
@@ -43,7 +43,7 @@ class Friend extends \Atk4\Data\Model {
         parent::init();
         
         $this->addField('name'); // friend's name
-        $this->addField('file', [\Atk4\Multiupload\Field\FileField::class, 'flysystem' => $this->persistence->getApp()->filesystem]); // storing file here
+        $this->addField('file', [\Atk4\Multiupload\Field\FileField::class, 'flysystem' => $this->getPersistence()->getApp()->filesystem]); // storing file here
         
     }
 }
@@ -51,6 +51,7 @@ class Friend extends \Atk4\Data\Model {
 $form = Form::addTo($app);
 $model = new Friend($app->db, ['filesystem' => $app->filesystem]);
 $entity = $model->tryLoad(1);
+if (!$entity) { $entity = $model->createEntity(); }
 $form->setModel($entity);
 $form->onSubmit(function($form)  {
     $form->model->save(); 
