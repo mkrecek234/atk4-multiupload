@@ -106,7 +106,7 @@ class FileField extends Field
                 // mark new file as linked
                 if($newtokens) {
                     foreach ((array) explode(',', $newtokens) as $newtoken) {
-                        $m->refModel($this->shortName)->loadBy('token', $newtoken)->save(['status'=>'linked']);
+                        $this->fileModel->loadBy('token', $newtoken)->save(['status'=>'linked']);
                     }
                 }
             }
@@ -116,7 +116,7 @@ class FileField extends Field
                 $tokens = $m->get($this->shortName);
             if ($tokens) {
                 foreach (explode(',', $tokens) as $token) {
-                    $m->refModel($this->shortName)->loadBy('token', $token)->delete();
+                    $this->fileModel->loadBy('token', $token)->delete();
                 }
             }
         });
