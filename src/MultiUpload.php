@@ -109,7 +109,7 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
         $this->cb = \Atk4\Ui\JsCallback::addTo($this);
 
         if (!$this->action) {
-            $this->action = new \Atk4\Ui\Button(['icon' => 'upload', 'class.disabled' => ($this->disabled || $this->readonly)]);
+            $this->action = new \Atk4\Ui\Button(['icon' => 'upload', 'class.disabled' => ($this->disabled || $this->readOnly)]);
         }
     }
 
