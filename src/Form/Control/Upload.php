@@ -10,7 +10,7 @@ use League\MimeTypeDetection\FinfoMimeTypeDetector;
 class Upload extends \Atk4\Multiupload\MultiUpload 
 {
 
-    public $model = null; // File model
+    public ?\Atk4\Data\Model $model = null; // File model
     
     /** @var EntityFieldPair<\Atk4\Filestore\Model\File, File> */
     public $entityField;
