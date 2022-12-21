@@ -68,7 +68,7 @@ class FileField extends Field
         $archive = new $this->fileModel($this->fileModel->getPersistence());
             
         // only show records of currently loaded record
-        if (!($GLOBALS['model'] === $m) && (array_key_exists('mid', $_REQUEST) || array_key_exists('id', $_GET))) {
+        if ((array_key_exists('model', $GLOBALS) && !($GLOBALS['model'] === $m)) && (array_key_exists('mid', $_REQUEST) || array_key_exists('id', $_GET))) {
             // Very bad workaround as the parent model id cannot be found in the variables - $m is not loaded for VirtualPage modals yet, but it is in the $_REQUEST.
 
             $mcloned = (clone $this->getOwner());
@@ -78,7 +78,7 @@ class FileField extends Field
             } else {
                 $archive->setLimit(1);
             }
-        } elseif (($GLOBALS['model'] === $m) && array_key_exists('entity', $GLOBALS) && ($GLOBALS['entity']->isEntity())) {
+        } elseif ((array_key_exists('model', $GLOBALS) && $GLOBALS['model'] === $m) && array_key_exists('entity', $GLOBALS) && ($GLOBALS['entity']->isEntity())) {
             $archive->addCondition($archive->expr("FIND_IN_SET(token,'".($GLOBALS['entity']->get($this->shortName) ?? 'notavailable')."')>0"));
         } else {
             $archive->setLimit(1);
