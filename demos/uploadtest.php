@@ -33,7 +33,7 @@ $control->set("token-5f2fec025c3bb,token-5f2fec025c3bc");
 
 
 $control->onDelete(function ($fileId) {
-    return new \Atk4\Ui\JsToast([
+    return new \Atk4\Ui\Js\JsToast([
         'title' => 'Delete successfully',
         'message' => $fileId . ' has been removed',
         'class' => 'success',
@@ -41,7 +41,7 @@ $control->onDelete(function ($fileId) {
 });
 
 $control->onDownload(function ($fileId) {
-    return new \Atk4\Ui\JsToast([
+    return new \Atk4\Ui\Js\JsToast([
         'title' => 'Download successfully',
         'message' => $fileId . ' is being downloaded',
         'class' => 'success',
@@ -54,7 +54,7 @@ $control->onUpload(function ($files) use ($form, $control) {
     }
     $control->setFileId('a_token'.rand(0,100));
 
-    return new \Atk4\Ui\JsToast([
+    return new \Atk4\Ui\Js\JsToast([
         'title' => 'Upload success',
         'message' => 'File '. $files['name'] . ' with token is uploaded!',
         'class' => 'success',
@@ -69,7 +69,7 @@ $control2->set('a_new_token', 'an-img-file-name');
     
 $control2->onDelete(function ($fileId) {
         
-        return new \Atk4\Ui\JsToast([
+        return new \Atk4\Ui\Js\JsToast([
             'title' => 'Delete successfully',
             'message' => $fileId . ' has been removed',
             'class' => 'success',
@@ -93,7 +93,7 @@ $control2->onDelete(function ($fileId) {
             //return $form->error('file', 'Unable to upload file.');
             
             // can also return a notifier.
-            return new \Atk4\Ui\JsToast([
+            return new \Atk4\Ui\Js\JsToast([
                 'title' => 'Upload success',
                 'message' => 'Image is uploaded!',
                 'class' => 'success',

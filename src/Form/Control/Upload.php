@@ -69,7 +69,7 @@ class Upload extends \Atk4\Multiupload\MultiUpload
         $entity->save();
         $this->setFileId($entity->get('token'));
         
-        $js =  new \Atk4\Ui\JsToast(['message' => $entity->get('meta_filename').' uploaded!', 'class' => 'success']);
+        $js =  new \Atk4\Ui\Js\JsToast(['message' => $entity->get('meta_filename').' uploaded!', 'class' => 'success']);
         return $js;
     }
 
@@ -78,7 +78,7 @@ class Upload extends \Atk4\Multiupload\MultiUpload
         $model = $this->model;
         $entity = $model->tryLoadBy('token', $token);
         
-        $js =  new \Atk4\Ui\JsToast(['message' => $entity->get('meta_filename').' has been removed!', 'class' => 'success']);
+        $js =  new \Atk4\Ui\Js\JsToast(['message' => $entity->get('meta_filename').' has been removed!', 'class' => 'success']);
         if ($entity->isLoaded() && $entity->get('status') === 'draft') {
             $entity->delete();
         }
@@ -91,7 +91,7 @@ class Upload extends \Atk4\Multiupload\MultiUpload
         $model = $this->model;
         $entity = $model->tryLoadBy('token', $token);
   
-        $js = [ new \Atk4\Ui\JsToast(['message' => $entity->get('meta_filename').' is being downloaded!', 'class' => 'success']),
+        $js = [ new \Atk4\Ui\Js\JsToast(['message' => $entity->get('meta_filename').' is being downloaded!', 'class' => 'success']),
                 ];
 
         return $js;
