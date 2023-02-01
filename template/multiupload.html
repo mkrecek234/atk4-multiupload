@@ -4,13 +4,13 @@
     <input type="text" placeholder="{$PlaceHolder}" readonly/>
     {Input}<input type="{input_type}text{/}" {$input_attributes}/>{/}
     <i class="{DropIcon}dropdown icon{/}"></i>
-    <input type="file" accept="{$accept}" {$multiple} style="position: absolute; top: 0px; z-index: -1; left: 0px; width: 100%; height: 100%; opacity: 0;"/>
     <div class="default text">{DefaultText}...{/}</div>
     <div class="menu">
         {Item}
         <div class="item" data-value="{$value}">{Icon}<i class="{$icon}"></i>{/Icon}<div class="filetitle" style="display: inline-block">{$title}</div></div>
         {/Item}
     </div>
+    <input type="file" accept="{$accept}" {$multiple} style="position: absolute; top: 0px; z-index: -1; left: 0px; width: 100%; height: 100%; opacity: 0;"/>
 
     {$AfterInput}{$AfterAfterInput}
     <div class="ui tiny indicating progress" data-value="1" data-total="100">
