@@ -220,9 +220,9 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
                 ]);
                 }
             }
-        
-            
-            return $this->jsActions;
+
+
+            return new JsBlock($this->jsActions);
         });
     }
     }
@@ -243,7 +243,7 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
                 $fileName = $_POST['f_name'] ?? null; 
                 $this->addJsAction($fx($fileName));
 
-                return $this->jsActions; 
+                return new JsBlock($this->jsActions);
             });
         
         }
@@ -266,8 +266,8 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
                 
                 $fileName = $_POST['f_name'] ?? null;
                 $this->addJsAction($fx($fileName));
-                
-                return $this->jsActions;
+
+                return new JsBlock($this->jsActions);
             });
                 
         }
