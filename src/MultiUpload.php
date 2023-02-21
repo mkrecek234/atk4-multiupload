@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Atk4\Multiupload;
 
 use Atk4\Ui\Exception;
+use Atk4\Ui\Js\JsBlock;
 
 /**
  * Class Upload.
