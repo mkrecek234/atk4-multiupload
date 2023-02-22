@@ -50,7 +50,7 @@ $control->onDownload(function ($fileId) {
 
 $control->onUpload(function ($files) use ($form, $control) {
     if ($files === 'error') {
-        return $form->error('file', 'Error uploading file.');
+        return $form->jsError('file', 'Error uploading file.');
     }
     $control->setFileId('a_token'.rand(0,100));
 
@@ -80,7 +80,7 @@ $control2->onDelete(function ($fileId) {
         
         $control2->onUpload(function ($files) use ($form) {
             if ($files === 'error') {
-                return $form->error('img', 'Error uploading image.');
+                return $form->jsError('img', 'Error uploading image.');
             }
             
             //Do file processing here...
@@ -90,7 +90,7 @@ $control2->onDelete(function ($fileId) {
             
             // js Action can be return.
             //if using form, can return an error to form control directly.
-            //return $form->error('file', 'Unable to upload file.');
+            //return $form->jsError('file', 'Unable to upload file.');
             
             // can also return a notifier.
             return new \Atk4\Ui\Js\JsToast([
@@ -102,5 +102,5 @@ $control2->onDelete(function ($fileId) {
 
 $form->onSubmit(function (Form $form) {
     // implement submission here
-    return $form->success('Thanks for submitting file');
+    return $form->jsSuccess('Thanks for submitting file');
 });
