@@ -78,7 +78,7 @@ class Upload extends \Atk4\Multiupload\MultiUpload
         $model = $this->model;
         $entity = $model->tryLoadBy('token', $token);
         
-        if ($entity->isLoaded() && $entity->get('status') === 'draft') {
+        if ($entity && $entity->get('status') === 'draft') {
             $js =  new \Atk4\Ui\Js\JsToast(['message' => $entity->get('meta_filename').' has been removed!', 'class' => 'success']);
             $entity->delete();
         }
