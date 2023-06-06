@@ -15,7 +15,7 @@ Simply add the multiupload field in your form like this.
 ```
 $control = $form->addControl('file', [\atk4\multiupload\MultiUpload::class,
     'empty'      => 'Upload multiple files',
-    'isMultiple' => true
+    'multiple' => true
 ]
     );
 $control->setModel(new \Atk4\Filestore\Model\File($app->db));

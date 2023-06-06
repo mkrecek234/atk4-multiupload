@@ -20,7 +20,7 @@ $form = Form::addTo($app);
 
 $control = $form->addControl('file', [\Atk4\Multiupload\MultiUpload::class,
     'empty'      => 'Upload multiple files',
-    'isMultiple' => true,
+    'multiple' => true,
   //  'dropdownOptions' => ['allowAdditions' => true]
 ]
     );

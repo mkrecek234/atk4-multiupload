@@ -104,7 +104,7 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
         
         $this->setDropDownOption('allowAdditions', true);
         $this->setDropDownOption('search', false);
-        $this->isMultiple = true;
+        $this->multiple = true;
         //$this->inputType = 'hidden';
 
         $this->cb = \Atk4\Ui\JsCallback::addTo($this);
