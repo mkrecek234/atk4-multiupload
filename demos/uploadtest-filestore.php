@@ -41,9 +41,10 @@ class Friend extends \Atk4\Data\Model {
     protected function init() : void {
         
         parent::init();
-        
+
         $this->addField('name'); // friend's name
-        $this->addField('file', [\Atk4\Multiupload\Field\FileField::class, 'flysystem' => $this->getPersistence()->getApp()->filesystem]); // storing file here
+        $this->addField('file', [\Atk4\Multiupload\Field\FileField::class,
+            'flysystem' => $this->filesystem]); // storing file here
         
     }
 }

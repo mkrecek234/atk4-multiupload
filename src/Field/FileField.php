@@ -56,8 +56,7 @@ class FileField extends Field
         $this->_init();
         
         if ($this->fileModel === null) {
-            $this->fileModel = new File($this->getOwner()->getPersistence());
-            $this->fileModel->flysystem = $this->flysystem;
+            $this->fileModel = new File($this->getOwner()->getPersistence(), ['flysystem' => $this->flysystem]);
         }
         
         $this->fieldNameBase = preg_replace('/_id$/', '', $this->shortName);
@@ -97,8 +96,8 @@ class FileField extends Field
                 // remove old file, we don't need it
                 if($oldtokens) {
                     foreach (explode(',', $oldtokens) as $oldtoken) {
-                        if (($newtokens) && (!in_array($oldtoken, explode(',', $newtokens)))) {
-                           $this->fileModel->loadBy('token', $oldtoken)->delete();
+                        if (!$newtokens || ($newtokens && !in_array($oldtoken, explode(',', $newtokens)))) {
+                            $this->fileModel->loadBy('token', $oldtoken)->delete();
                         }
                     }
                 }

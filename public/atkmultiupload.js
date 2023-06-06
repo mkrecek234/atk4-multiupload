@@ -1381,6 +1381,94 @@ module.exports = function (originalArray, length) {
 
 /***/ }),
 
+/***/ "./node_modules/core-js/internals/async-iterator-create-proxy.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/core-js/internals/async-iterator-create-proxy.js ***!
+  \***********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var call = __webpack_require__(/*! ../internals/function-call */ "./node_modules/core-js/internals/function-call.js");
+var anObject = __webpack_require__(/*! ../internals/an-object */ "./node_modules/core-js/internals/an-object.js");
+var create = __webpack_require__(/*! ../internals/object-create */ "./node_modules/core-js/internals/object-create.js");
+var createNonEnumerableProperty = __webpack_require__(/*! ../internals/create-non-enumerable-property */ "./node_modules/core-js/internals/create-non-enumerable-property.js");
+var defineBuiltIns = __webpack_require__(/*! ../internals/define-built-ins */ "./node_modules/core-js/internals/define-built-ins.js");
+var wellKnownSymbol = __webpack_require__(/*! ../internals/well-known-symbol */ "./node_modules/core-js/internals/well-known-symbol.js");
+var InternalStateModule = __webpack_require__(/*! ../internals/internal-state */ "./node_modules/core-js/internals/internal-state.js");
+var getBuiltIn = __webpack_require__(/*! ../internals/get-built-in */ "./node_modules/core-js/internals/get-built-in.js");
+var getMethod = __webpack_require__(/*! ../internals/get-method */ "./node_modules/core-js/internals/get-method.js");
+var AsyncIteratorPrototype = __webpack_require__(/*! ../internals/async-iterator-prototype */ "./node_modules/core-js/internals/async-iterator-prototype.js");
+
+var Promise = getBuiltIn('Promise');
+
+var ASYNC_ITERATOR_PROXY = 'AsyncIteratorProxy';
+var setInternalState = InternalStateModule.set;
+var getInternalState = InternalStateModule.getterFor(ASYNC_ITERATOR_PROXY);
+
+var TO_STRING_TAG = wellKnownSymbol('toStringTag');
+
+module.exports = function (nextHandler, IS_ITERATOR) {
+  var AsyncIteratorProxy = function AsyncIterator(record, state) {
+    if (state) {
+      state.iterator = record.iterator;
+      state.next = record.next;
+    } else state = record;
+    state.type = ASYNC_ITERATOR_PROXY;
+    state.done = false;
+    state.ignoreArgument = !IS_ITERATOR;
+    setInternalState(this, state);
+  };
+
+  AsyncIteratorProxy.prototype = defineBuiltIns(create(AsyncIteratorPrototype), {
+    next: function next(arg) {
+      var that = this;
+      var hasArgument = !!arguments.length;
+      return new Promise(function (resolve) {
+        var state = getInternalState(that);
+        var args = hasArgument ? [state.ignoreArgument ? undefined : arg] : IS_ITERATOR ? [] : [undefined];
+        state.ignoreArgument = false;
+        resolve(state.done ? { done: true, value: undefined } : anObject(call(nextHandler, state, Promise, args)));
+      });
+    },
+    'return': function (value) {
+      var that = this;
+      return new Promise(function (resolve, reject) {
+        var state = getInternalState(that);
+        var iterator = state.iterator;
+        state.done = true;
+        var $$return = getMethod(iterator, 'return');
+        if ($$return === undefined) return resolve({ done: true, value: value });
+        Promise.resolve(call($$return, iterator, value)).then(function (result) {
+          anObject(result);
+          resolve({ done: true, value: value });
+        }, reject);
+      });
+    },
+    'throw': function (value) {
+      var that = this;
+      return new Promise(function (resolve, reject) {
+        var state = getInternalState(that);
+        var iterator = state.iterator;
+        state.done = true;
+        var $$throw = getMethod(iterator, 'throw');
+        if ($$throw === undefined) return reject(value);
+        resolve(call($$throw, iterator, value));
+      });
+    }
+  });
+
+  if (!IS_ITERATOR) {
+    createNonEnumerableProperty(AsyncIteratorProxy.prototype, TO_STRING_TAG, 'Generator');
+  }
+
+  return AsyncIteratorProxy;
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/core-js/internals/async-iterator-iteration.js":
 /*!********************************************************************!*\
   !*** ./node_modules/core-js/internals/async-iterator-iteration.js ***!
@@ -1481,6 +1569,54 @@ module.exports = {
   some: createMethod(3),
   find: createMethod(4)
 };
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/internals/async-iterator-prototype.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/core-js/internals/async-iterator-prototype.js ***!
+  \********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var global = __webpack_require__(/*! ../internals/global */ "./node_modules/core-js/internals/global.js");
+var shared = __webpack_require__(/*! ../internals/shared-store */ "./node_modules/core-js/internals/shared-store.js");
+var isCallable = __webpack_require__(/*! ../internals/is-callable */ "./node_modules/core-js/internals/is-callable.js");
+var create = __webpack_require__(/*! ../internals/object-create */ "./node_modules/core-js/internals/object-create.js");
+var getPrototypeOf = __webpack_require__(/*! ../internals/object-get-prototype-of */ "./node_modules/core-js/internals/object-get-prototype-of.js");
+var defineBuiltIn = __webpack_require__(/*! ../internals/define-built-in */ "./node_modules/core-js/internals/define-built-in.js");
+var wellKnownSymbol = __webpack_require__(/*! ../internals/well-known-symbol */ "./node_modules/core-js/internals/well-known-symbol.js");
+var IS_PURE = __webpack_require__(/*! ../internals/is-pure */ "./node_modules/core-js/internals/is-pure.js");
+
+var USE_FUNCTION_CONSTRUCTOR = 'USE_FUNCTION_CONSTRUCTOR';
+var ASYNC_ITERATOR = wellKnownSymbol('asyncIterator');
+var AsyncIterator = global.AsyncIterator;
+var PassedAsyncIteratorPrototype = shared.AsyncIteratorPrototype;
+var AsyncIteratorPrototype, prototype;
+
+if (PassedAsyncIteratorPrototype) {
+  AsyncIteratorPrototype = PassedAsyncIteratorPrototype;
+} else if (isCallable(AsyncIterator)) {
+  AsyncIteratorPrototype = AsyncIterator.prototype;
+} else if (shared[USE_FUNCTION_CONSTRUCTOR] || global[USE_FUNCTION_CONSTRUCTOR]) {
+  try {
+    // eslint-disable-next-line no-new-func -- we have no alternatives without usage of modern syntax
+    prototype = getPrototypeOf(getPrototypeOf(getPrototypeOf(Function('return async function*(){}()')())));
+    if (getPrototypeOf(prototype) === Object.prototype) AsyncIteratorPrototype = prototype;
+  } catch (error) { /* empty */ }
+}
+
+if (!AsyncIteratorPrototype) AsyncIteratorPrototype = {};
+else if (IS_PURE) AsyncIteratorPrototype = create(AsyncIteratorPrototype);
+
+if (!isCallable(AsyncIteratorPrototype[ASYNC_ITERATOR])) {
+  defineBuiltIn(AsyncIteratorPrototype, ASYNC_ITERATOR, function () {
+    return this;
+  });
+}
+
+module.exports = AsyncIteratorPrototype;
 
 
 /***/ }),
@@ -4530,6 +4666,78 @@ module.exports = function (iterator, kind, value) {
   if (innerError) throw innerResult;
   anObject(innerResult);
   return value;
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/internals/iterator-create-proxy.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/core-js/internals/iterator-create-proxy.js ***!
+  \*****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var call = __webpack_require__(/*! ../internals/function-call */ "./node_modules/core-js/internals/function-call.js");
+var anObject = __webpack_require__(/*! ../internals/an-object */ "./node_modules/core-js/internals/an-object.js");
+var create = __webpack_require__(/*! ../internals/object-create */ "./node_modules/core-js/internals/object-create.js");
+var createNonEnumerableProperty = __webpack_require__(/*! ../internals/create-non-enumerable-property */ "./node_modules/core-js/internals/create-non-enumerable-property.js");
+var defineBuiltIns = __webpack_require__(/*! ../internals/define-built-ins */ "./node_modules/core-js/internals/define-built-ins.js");
+var wellKnownSymbol = __webpack_require__(/*! ../internals/well-known-symbol */ "./node_modules/core-js/internals/well-known-symbol.js");
+var InternalStateModule = __webpack_require__(/*! ../internals/internal-state */ "./node_modules/core-js/internals/internal-state.js");
+var getMethod = __webpack_require__(/*! ../internals/get-method */ "./node_modules/core-js/internals/get-method.js");
+var IteratorPrototype = __webpack_require__(/*! ../internals/iterators-core */ "./node_modules/core-js/internals/iterators-core.js").IteratorPrototype;
+
+var ITERATOR_PROXY = 'IteratorProxy';
+var setInternalState = InternalStateModule.set;
+var getInternalState = InternalStateModule.getterFor(ITERATOR_PROXY);
+
+var TO_STRING_TAG = wellKnownSymbol('toStringTag');
+
+module.exports = function (nextHandler, IS_ITERATOR) {
+  var IteratorProxy = function Iterator(record, state) {
+    if (state) {
+      state.iterator = record.iterator;
+      state.next = record.next;
+    } else state = record;
+    state.type = ITERATOR_PROXY;
+    state.done = false;
+    state.ignoreArg = !IS_ITERATOR;
+    setInternalState(this, state);
+  };
+
+  IteratorProxy.prototype = defineBuiltIns(create(IteratorPrototype), {
+    next: function next(arg) {
+      var state = getInternalState(this);
+      var args = arguments.length ? [state.ignoreArg ? undefined : arg] : IS_ITERATOR ? [] : [undefined];
+      state.ignoreArg = false;
+      var result = state.done ? undefined : call(nextHandler, state, args);
+      return { done: state.done, value: result };
+    },
+    'return': function (value) {
+      var state = getInternalState(this);
+      var iterator = state.iterator;
+      state.done = true;
+      var $$return = getMethod(iterator, 'return');
+      return { done: true, value: $$return ? anObject(call($$return, iterator, value)).value : value };
+    },
+    'throw': function (value) {
+      var state = getInternalState(this);
+      var iterator = state.iterator;
+      state.done = true;
+      var $$throw = getMethod(iterator, 'throw');
+      if ($$throw) return call($$throw, iterator, value);
+      throw value;
+    }
+  });
+
+  if (!IS_ITERATOR) {
+    createNonEnumerableProperty(IteratorProxy.prototype, TO_STRING_TAG, 'Generator');
+  }
+
+  return IteratorProxy;
 };
 
 
@@ -16897,6 +17105,61 @@ __webpack_require__(/*! ../modules/es.weak-set.constructor */ "./node_modules/co
 
 /***/ }),
 
+/***/ "./node_modules/core-js/modules/esnext.async-iterator.filter.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/core-js/modules/esnext.async-iterator.filter.js ***!
+  \**********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// https://github.com/tc39/proposal-iterator-helpers
+var $ = __webpack_require__(/*! ../internals/export */ "./node_modules/core-js/internals/export.js");
+var apply = __webpack_require__(/*! ../internals/function-apply */ "./node_modules/core-js/internals/function-apply.js");
+var aCallable = __webpack_require__(/*! ../internals/a-callable */ "./node_modules/core-js/internals/a-callable.js");
+var anObject = __webpack_require__(/*! ../internals/an-object */ "./node_modules/core-js/internals/an-object.js");
+var getIteratorDirect = __webpack_require__(/*! ../internals/get-iterator-direct */ "./node_modules/core-js/internals/get-iterator-direct.js");
+var createAsyncIteratorProxy = __webpack_require__(/*! ../internals/async-iterator-create-proxy */ "./node_modules/core-js/internals/async-iterator-create-proxy.js");
+
+var AsyncIteratorProxy = createAsyncIteratorProxy(function (Promise, args) {
+  var state = this;
+  var filterer = state.filterer;
+
+  return new Promise(function (resolve, reject) {
+    var loop = function () {
+      try {
+        Promise.resolve(anObject(apply(state.next, state.iterator, args))).then(function (step) {
+          try {
+            if (anObject(step).done) {
+              state.done = true;
+              resolve({ done: true, value: undefined });
+            } else {
+              var value = step.value;
+              Promise.resolve(filterer(value)).then(function (selected) {
+                selected ? resolve({ done: false, value: value }) : loop();
+              }, reject);
+            }
+          } catch (err) { reject(err); }
+        }, reject);
+      } catch (error) { reject(error); }
+    };
+
+    loop();
+  });
+});
+
+$({ target: 'AsyncIterator', proto: true, real: true, forced: true }, {
+  filter: function filter(filterer) {
+    return new AsyncIteratorProxy(getIteratorDirect(this), {
+      filterer: aCallable(filterer)
+    });
+  }
+});
+
+
+/***/ }),
+
 /***/ "./node_modules/core-js/modules/esnext.async-iterator.find.js":
 /*!********************************************************************!*\
   !*** ./node_modules/core-js/modules/esnext.async-iterator.find.js ***!
@@ -16989,6 +17252,49 @@ IteratorConstructor.prototype = IteratorPrototype;
 
 $({ global: true, constructor: true, forced: FORCED }, {
   Iterator: IteratorConstructor
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/modules/esnext.iterator.filter.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/core-js/modules/esnext.iterator.filter.js ***!
+  \****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// https://github.com/tc39/proposal-iterator-helpers
+var $ = __webpack_require__(/*! ../internals/export */ "./node_modules/core-js/internals/export.js");
+var apply = __webpack_require__(/*! ../internals/function-apply */ "./node_modules/core-js/internals/function-apply.js");
+var aCallable = __webpack_require__(/*! ../internals/a-callable */ "./node_modules/core-js/internals/a-callable.js");
+var anObject = __webpack_require__(/*! ../internals/an-object */ "./node_modules/core-js/internals/an-object.js");
+var getIteratorDirect = __webpack_require__(/*! ../internals/get-iterator-direct */ "./node_modules/core-js/internals/get-iterator-direct.js");
+var createIteratorProxy = __webpack_require__(/*! ../internals/iterator-create-proxy */ "./node_modules/core-js/internals/iterator-create-proxy.js");
+var callWithSafeIterationClosing = __webpack_require__(/*! ../internals/call-with-safe-iteration-closing */ "./node_modules/core-js/internals/call-with-safe-iteration-closing.js");
+
+var IteratorProxy = createIteratorProxy(function (args) {
+  var iterator = this.iterator;
+  var filterer = this.filterer;
+  var next = this.next;
+  var result, done, value;
+  while (true) {
+    result = anObject(apply(next, iterator, args));
+    done = this.done = !!result.done;
+    if (done) return;
+    value = result.value;
+    if (callWithSafeIterationClosing(iterator, filterer, value)) return value;
+  }
+});
+
+$({ target: 'Iterator', proto: true, real: true, forced: true }, {
+  filter: function filter(filterer) {
+    return new IteratorProxy(getIteratorDirect(this), {
+      filterer: aCallable(filterer)
+    });
+  }
 });
 
 
@@ -20162,17 +20468,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var core_js_modules_esnext_iterator_constructor_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_esnext_iterator_constructor_js__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var core_js_modules_esnext_iterator_find_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! core-js/modules/esnext.iterator.find.js */ "./node_modules/core-js/modules/esnext.iterator.find.js");
 /* harmony import */ var core_js_modules_esnext_iterator_find_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_esnext_iterator_find_js__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! jquery */ "jquery");
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _atk_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./atk.plugin */ "./src/plugins/atk.plugin.js");
-/* harmony import */ var _services_multiupload_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../services/multiupload.service */ "./src/services/multiupload.service.js");
+/* harmony import */ var core_js_modules_esnext_async_iterator_filter_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! core-js/modules/esnext.async-iterator.filter.js */ "./node_modules/core-js/modules/esnext.async-iterator.filter.js");
+/* harmony import */ var core_js_modules_esnext_async_iterator_filter_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_esnext_async_iterator_filter_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var core_js_modules_esnext_iterator_filter_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! core-js/modules/esnext.iterator.filter.js */ "./node_modules/core-js/modules/esnext.iterator.filter.js");
+/* harmony import */ var core_js_modules_esnext_iterator_filter_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_esnext_iterator_filter_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! jquery */ "jquery");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _atk_plugin__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./atk.plugin */ "./src/plugins/atk.plugin.js");
+/* harmony import */ var _services_multiupload_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../services/multiupload.service */ "./src/services/multiupload.service.js");
 
 
 
 
 
 
-class multifileUpload extends _atk_plugin__WEBPACK_IMPORTED_MODULE_4__["default"] {
+
+
+class multifileUpload extends _atk_plugin__WEBPACK_IMPORTED_MODULE_6__["default"] {
   main() {
     this.textInput = this.$el.find('input[type="text"]');
     this.hiddenInput = this.$el.find('input[type="hidden"]');
@@ -20208,8 +20520,8 @@ class multifileUpload extends _atk_plugin__WEBPACK_IMPORTED_MODULE_4__["default"
         active: '{percent}%'
       }
     }).hide();
-    this.$el.data().fileId = this.settings.file.id; //this.hiddenInput.val(this.settings.file.id);
-
+    this.$el.data().fileId = this.settings.file.id;
+    this.hiddenInput.val(this.settings.file.id);
     this.textInput.val(this.settings.file.name);
     this.textInput.data('isTouch', false);
 
@@ -20302,13 +20614,15 @@ class multifileUpload extends _atk_plugin__WEBPACK_IMPORTED_MODULE_4__["default"
       }
     }); // Add click events for items.
 
-    this.$el.on('click', '> .label > .filetitle', e => {
-      let id = jquery__WEBPACK_IMPORTED_MODULE_3___default()(e.target).parent().data('value');
+    jquery__WEBPACK_IMPORTED_MODULE_5___default()('.filetitle').on('click', '', e => {
+      let id = jquery__WEBPACK_IMPORTED_MODULE_5___default()(e.target).parent().data('value');
       that.doFileDownload(id);
     });
-    this.$el.on('click', '> .label > .delete.icon', e => {
-      let id = jquery__WEBPACK_IMPORTED_MODULE_3___default()(e.target).parent().data('value');
+    jquery__WEBPACK_IMPORTED_MODULE_5___default()('.delete.icon').on('click', '', e => {
+      let id = jquery__WEBPACK_IMPORTED_MODULE_5___default()(e.target).parent().data('value');
       that.doFileDelete(id);
+      let arr = this.hiddenInput.val().split(',');
+      this.hiddenInput.val(arr.filter(item => item !== id).join(','));
     }); // add event handler to file input.
 
     this.fileInput.on('change', e => {
@@ -20350,7 +20664,7 @@ class multifileUpload extends _atk_plugin__WEBPACK_IMPORTED_MODULE_4__["default"
     // during upload.
 
     if (this.settings.submit) {
-      jquery__WEBPACK_IMPORTED_MODULE_3___default()('#' + this.settings.submit).addClass('disabled');
+      jquery__WEBPACK_IMPORTED_MODULE_5___default()('#' + this.settings.submit).addClass('disabled');
     } // setup task on upload completion.
 
 
@@ -20361,7 +20675,7 @@ class multifileUpload extends _atk_plugin__WEBPACK_IMPORTED_MODULE_4__["default"
       }
 
       if (that.settings.submit) {
-        jquery__WEBPACK_IMPORTED_MODULE_3___default()('#' + that.settings.submit).removeClass('disabled');
+        jquery__WEBPACK_IMPORTED_MODULE_5___default()('#' + that.settings.submit).removeClass('disabled');
       }
     }; // setup progress bar update via xhr.
 
@@ -20378,7 +20692,7 @@ class multifileUpload extends _atk_plugin__WEBPACK_IMPORTED_MODULE_4__["default"
     };
 
     that.bar.show();
-    _services_multiupload_service__WEBPACK_IMPORTED_MODULE_5__["default"].multiuploadFiles(file, this.$el, {
+    _services_multiupload_service__WEBPACK_IMPORTED_MODULE_7__["default"].multiuploadFiles(file, this.$el, {
       f_upload_action: 'upload'
     }, this.settings.uri, completeCb, xhrCb);
   }

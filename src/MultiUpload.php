@@ -12,7 +12,7 @@ use Atk4\Ui\Js\JsBlock;
  */
 class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
 {
-   // public $inputType = 'hidden';
+    public string $inputType = 'hidden';
     /**
      * The action button to open file browser dialog.
      *
@@ -109,8 +109,11 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
 
         $this->cb = \Atk4\Ui\JsCallback::addTo($this);
 
-        if (!$this->action) {
-            $this->action = new \Atk4\Ui\Button(['icon' => 'upload', 'class.disabled' => ($this->disabled || $this->readOnly)]);
+        if ($this->action === null) {
+            $this->action = new \Atk4\Ui\Button([
+                'icon' => 'upload',
+                'class.disabled' => $this->disabled || $this->readOnly,
+            ]);
         }
     }
 
@@ -125,7 +128,7 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
      *
      * @return $this|void
      */
- /*   public function set($fileId = null, $fileName = null, $junk = null)
+    public function set($fileId = null, $fileName = null, $junk = null)
     {
         $this->setFileId($fileId);
 
@@ -134,7 +137,7 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
         }
 
         return $this->setInput($fileName, $junk);
-    } */
+    }
 
     /**
      * Set input field value.
@@ -276,10 +279,6 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
 
     protected function renderView(): void
     {
-        //need before parent rendering.
-        if ($this->disabled) {
-            $this->addClass('disabled');
-        }
         parent::renderView();
 
         if ($this->cb->canTerminate()) {
@@ -290,18 +289,20 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
                 throw new Exception('Missing onDelete callback.');
             }
         }
-        
-        if (!empty($this->accept)) {
-            $this->template->trySet('accept', implode(',', $this->accept));
-        }
-        if ($this->multiple) {
-            $this->template->trySet('multiple', 'multiple');
+
+        if ($this->accept !== []) {
+            $this->template->set('accept', implode(', ', $this->accept));
         }
 
-        if ($this->placeholder) {
-            $this->template->trySet('PlaceHolder', $this->placeholder);
+        if ($this->disabled || $this->readOnly) {
+            $this->template->dangerouslySetHtml('disabled', 'disabled="disabled"');
         }
-        
+
+        if ($this->multiple) {
+            $this->template->dangerouslySetHtml('multiple', 'multiple="multiple"');
+        }
+
+
         if (!$this->isJsLoaded) {
             $this->getApp()->requireJs('../public/atkmultiupload.js');
         }

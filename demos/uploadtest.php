@@ -11,8 +11,8 @@ use Atk4\Filestore\Model\File;
 
 include '../vendor/autoload.php';
 
-$app = new \Atk4\Ui\App('centered', false, true);
-$app->initLayout([\Atk4\Ui\Layout\Centered::class]); 
+$app = new \Atk4\Ui\App(['title' => 'Filestore Demo']);
+$app->initLayout([\Atk4\Ui\Layout\Centered::class]);
 $app->db = new \Atk4\Data\Persistence\Sql('mysql://root:root@localhost/atk4');
 
 

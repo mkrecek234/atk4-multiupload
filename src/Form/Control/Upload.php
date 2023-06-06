@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Atk4\Multiupload\Form\Control;
 
 use Atk4\Filestore\Field\FileField;
+use Atk4\Filestore\Model\File;
 use League\MimeTypeDetection\FinfoMimeTypeDetector;
 
 class Upload extends \Atk4\Multiupload\MultiUpload 
@@ -19,6 +20,10 @@ class Upload extends \Atk4\Multiupload\MultiUpload
   protected function init(): void {
        
         parent::init();
+
+        if ($this->model->flysystem === null) {
+            $this->model->flysystem = $this->entityField->getField()->flysystem;
+        }
 
         $this->onUpload(\Closure::fromCallable([$this, 'uploaded']));
         $this->onDelete(\Closure::fromCallable([$this, 'deleted']));
@@ -77,7 +82,8 @@ class Upload extends \Atk4\Multiupload\MultiUpload
     {  
         $model = $this->model;
         $entity = $model->tryLoadBy('token', $token);
-        
+
+
         if ($entity && $entity->get('status') === 'draft') {
             $js =  new \Atk4\Ui\Js\JsToast(['message' => $entity->get('meta_filename').' has been removed!', 'class' => 'success']);
             $entity->delete();

@@ -38,7 +38,7 @@ export default class multifileUpload extends atkPlugin {
     }).hide();
 
     this.$el.data().fileId = this.settings.file.id;
-    //this.hiddenInput.val(this.settings.file.id);
+    this.hiddenInput.val(this.settings.file.id);
     this.textInput.val(this.settings.file.name);
     this.textInput.data('isTouch', false);
     if (this.settings.file.id) {
@@ -128,16 +128,18 @@ export default class multifileUpload extends atkPlugin {
     });
     
 	// Add click events for items.
-	
-	this.$el.on('click', '> .label > .filetitle', (e) => {
+
+	$('.filetitle').on('click', '', (e) => {
 	  let id = $(e.target).parent().data('value');
       that.doFileDownload(id);
     });
     
-  	this.$el.on('click', '> .label > .delete.icon', (e) => {
+  	$('.delete.icon').on('click', '', (e) => {
   	  let id = $(e.target).parent().data('value');
   	  that.doFileDelete(id);
-    }); 
+      let arr = this.hiddenInput.val().split(',')
+      this.hiddenInput.val(arr.filter(item => item !== id).join(','))
+    });
 
     // add event handler to file input.
     this.fileInput.on('change', (e) => {
