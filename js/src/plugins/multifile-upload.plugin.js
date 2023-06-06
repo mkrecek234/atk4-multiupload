@@ -129,12 +129,12 @@ export default class multifileUpload extends atkPlugin {
     
 	// Add click events for items.
 
-	$('.filetitle').on('click', '', (e) => {
+    this.$el.find('.filetitle').on('click', '', (e) => {
 	  let id = $(e.target).parent().data('value');
       that.doFileDownload(id);
     });
     
-  	$('.delete.icon').on('click', '', (e) => {
+  	this.$el.find('.delete.icon').on('click', '', (e) => {
   	  let id = $(e.target).parent().data('value');
   	  that.doFileDelete(id);
       let arr = this.hiddenInput.val().split(',')

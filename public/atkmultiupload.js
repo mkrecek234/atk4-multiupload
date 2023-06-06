@@ -20614,11 +20614,11 @@ class multifileUpload extends _atk_plugin__WEBPACK_IMPORTED_MODULE_6__["default"
       }
     }); // Add click events for items.
 
-    jquery__WEBPACK_IMPORTED_MODULE_5___default()('.filetitle').on('click', '', e => {
+    this.$el.find('.filetitle').on('click', '', e => {
       let id = jquery__WEBPACK_IMPORTED_MODULE_5___default()(e.target).parent().data('value');
       that.doFileDownload(id);
     });
-    jquery__WEBPACK_IMPORTED_MODULE_5___default()('.delete.icon').on('click', '', e => {
+    this.$el.find('.delete.icon').on('click', '', e => {
       let id = jquery__WEBPACK_IMPORTED_MODULE_5___default()(e.target).parent().data('value');
       that.doFileDelete(id);
       let arr = this.hiddenInput.val().split(',');
