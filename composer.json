@@ -22,12 +22,12 @@
 
 	"require" : {
 		"atk4/ui" : "dev-develop",
-		"php" : ">=7.4 <=8.2",
+		"php" : ">=7.4 <8.3",
 		"atk4/filestore" : "dev-develop",
 		"atk4/data" : "dev-develop"
 	},
 	"require-release": {
-		"php": ">=7.4 <=8.2",
+		"php": ">=7.4 <8.3",
 		"atk4/ui": "~3.2.0",
 		"league/flysystem": "^2.0"
 	},
