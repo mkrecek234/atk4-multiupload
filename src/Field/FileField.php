@@ -65,7 +65,7 @@ class FileField extends Field
         
         $this->referenceLink = $this->getOwner()->addReference($this->shortName, ['model' => function($m) {
         $archive = new $this->fileModel($this->fileModel->getPersistence());
-            
+
         // only show records of currently loaded record
         if ((array_key_exists('model', $GLOBALS) && !($GLOBALS['model'] === $m)) && (array_key_exists('mid', $_REQUEST) || array_key_exists('id', $_GET))) {
             // Very bad workaround as the parent model id cannot be found in the variables - $m is not loaded for VirtualPage modals yet, but it is in the $_REQUEST.

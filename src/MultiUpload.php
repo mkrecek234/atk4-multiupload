@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Atk4\Multiupload;
 
+use Atk4\Data\Model;
 use Atk4\Ui\Exception;
 use Atk4\Ui\Js\JsBlock;
 
@@ -275,6 +276,37 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
             });
                 
         }
+    }
+
+    /**
+     * Used when a custom callback is defined for row rendering. Sets
+     * values to row template and appends it to main template.
+     *
+     * @param mixed                               $row
+     * @param ($row is Model ? never : array-key) $key
+     */
+    protected function _addCallBackRow($row, $key = null): void
+    {
+        if ($this->model !== null) {
+            $res = ($this->renderRowFunction)($row);
+            $this->_tItem->set('value', array_key_exists('value', $res) ? $res['value'] : $this->getApp()->uiPersistence->typecastAttributeSaveField($this->model->getField($this->model->idField), $row->getId()));
+        } else {
+            $res = ($this->renderRowFunction)($row, $key); // @phpstan-ignore-line https://github.com/phpstan/phpstan/issues/10283#issuecomment-1850438891
+            $this->_tItem->set('value', (string) $res['value']); // @phpstan-ignore-line https://github.com/phpstan/phpstan/issues/10283
+        }
+
+        $this->_tItem->set('title', $res['title']);
+
+        $this->_tItem->del('Icon');
+        if (isset($res['icon']) && $res['icon']) {
+            // compatibility with how $values property works on icons: 'icon'
+            // is defined in there
+            $this->_tIcon->set('iconClass', 'icon ' . $res['icon']);
+            $this->_tItem->dangerouslyAppendHtml('Icon', $this->_tIcon->renderToHtml());
+        }
+
+        // add item to template
+        $this->template->dangerouslyAppendHtml('Item', $this->_tItem->renderToHtml());
     }
 
     protected function renderView(): void
