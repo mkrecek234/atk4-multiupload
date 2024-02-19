@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace Atk4\Multiupload\Form\Control;
 
+use Atk4\Data\Field;
+use Atk4\Data\Model;
 use Atk4\Filestore\Field\FileField;
 use Atk4\Filestore\Model\File;
 use League\MimeTypeDetection\FinfoMimeTypeDetector;
+use Atk4\Data\Model\EntityFieldPair;
 
 class Upload extends \Atk4\Multiupload\MultiUpload 
 {
 
     public ?\Atk4\Data\Model $model = null; // File model
-    
-    /** @var EntityFieldPair<\Atk4\Filestore\Model\File, File> */
-    public $entityField;
+
+    /** @var EntityFieldPair<Model, Field>|null */
+    public ?EntityFieldPair $entityField = null;
     
 
   protected function init(): void {

@@ -49,5 +49,11 @@
 		"psr-4" : {
 			"atk4\\audit\\tests\\" : "tests/"
 		}
+	},
+	"config": {
+		"allow-plugins": {
+			"ergebnis/composer-normalize": true,
+			"phpstan/extension-installer": true
+		}
 	}
 }
