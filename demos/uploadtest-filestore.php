@@ -55,7 +55,7 @@ $entity = $model->tryLoad(1);
 if (!$entity) { $entity = $model->createEntity(); }
 $form->setModel($entity);
 $form->onSubmit(function($form)  {
-    $form->model->save(); 
+    $form->entity->save();
 });
 
 

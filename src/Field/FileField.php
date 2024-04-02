@@ -62,8 +62,9 @@ class FileField extends Field
         $this->fieldNameBase = preg_replace('/_id$/', '', $this->shortName);
         
         $this->importFields();
+        $m = $this->getOwner();
         
-        $this->referenceLink = $this->getOwner()->addReference($this->shortName, ['model' => function($m) {
+        $this->referenceLink = $this->getOwner()->addReference($this->shortName, ['model' => function($persistence) use ($m) {
         $archive = new $this->fileModel($this->fileModel->getPersistence());
 
         // only show records of currently loaded record
