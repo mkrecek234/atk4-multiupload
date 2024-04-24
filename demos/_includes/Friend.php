@@ -6,6 +6,7 @@ namespace Atk4\Filestore\Demos;
 
 use Atk4\Data\Model;
 use Atk4\Filestore\Field\FileField;
+use Atk4\Filestore\Model\File;
 use League\Flysystem\Filesystem;
 
 class Friend extends Model
@@ -22,5 +23,6 @@ class Friend extends Model
         $this->addField('name', ['required' => true]);
         $this->addField('file', [FileField::class, ['flysystem' => $this->filesystem]]);
         $this->addField('file2', [FileField::class, ['flysystem' => $this->filesystem]]);
+
     }
 }
