@@ -227,7 +227,7 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
             }
 
             $this->jsActions[] =
-                new \Atk4\Ui\Js\JsExpression("$(this).parent('.form.ui.initial').data('isDirty', true)");
+                new \Atk4\Ui\Js\JsExpression("$(this).parents('.form.ui.initial').data('isDirty', true)");
 
             return new JsBlock($this->jsActions);
         });
