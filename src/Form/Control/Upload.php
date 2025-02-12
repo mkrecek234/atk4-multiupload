@@ -22,8 +22,6 @@ class Upload extends \Atk4\Multiupload\MultiUpload
 
   protected function init(): void {
 
-        $this->dropdownOptions['clearable'] = false;
-
         parent::init();
 
         if ($this->model->flysystem === null) {

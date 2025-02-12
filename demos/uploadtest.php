@@ -19,7 +19,7 @@ $app->db = new \Atk4\Data\Persistence\Sql('mysql://root:root@localhost/atk4');
 $form = Form::addTo($app);
 
 $control = $form->addControl('file', [\Atk4\Multiupload\MultiUpload::class,
-    'empty'      => 'Upload multiple files',
+    'placeholder'      => 'Upload multiple files',
     'multiple' => true,
   //  'dropdownOptions' => ['allowAdditions' => true]
 ]

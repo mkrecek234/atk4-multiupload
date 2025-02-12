@@ -7,6 +7,7 @@ namespace Atk4\Multiupload;
 use Atk4\Data\Model;
 use Atk4\Ui\Exception;
 use Atk4\Ui\Js\JsBlock;
+use Atk4\Ui\Js\JsExpressionable;
 
 /**
  * Class Upload.
@@ -105,6 +106,7 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
         
         $this->setDropDownOption('allowAdditions', true);
         $this->setDropDownOption('search', false);
+
         $this->multiple = true;
         //$this->inputType = 'hidden';
 
@@ -312,6 +314,14 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
 
         // add item to template
         $this->template->dangerouslyAppendHtml('Item', $this->_tItem->renderToHtml());
+    }
+
+    protected function jsRenderDropdown(): JsExpressionable
+    {
+        $dropdownOptions = $this->dropdownOptions;
+        $dropdownOptions['clearable'] = false;
+
+        return $this->jsDropdown(true)->dropdown($dropdownOptions);
     }
 
     protected function renderView(): void
