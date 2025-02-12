@@ -53,7 +53,7 @@ $form = Form::addTo($app);
 $model = new Friend($app->db, ['filesystem' => $app->filesystem]);
 $entity = $model->tryLoad(1);
 if (!$entity) { $entity = $model->createEntity(); }
-$form->setModel($entity);
+$form->setEntity($entity);
 $form->onSubmit(function($form)  {
     $form->entity->save();
 });
