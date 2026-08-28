@@ -27970,20 +27970,21 @@ class multifileUpload extends _atk_plugin__WEBPACK_IMPORTED_MODULE_3__["default"
     });
 
     // Add click events for items.
-
-    this.$el.find('.filetitle').on('click', '', e => {
-      let id = jquery__WEBPACK_IMPORTED_MODULE_2___default()(e.target).parent().data('value');
-      that.doFileDownload(id);
-    });
-    this.$el.find('.ui.label').on('click', '', e => {
-      let id = jquery__WEBPACK_IMPORTED_MODULE_2___default()(e.target).data('value');
-      that.doFileDownload(id);
-    });
     this.$el.find('.delete.icon').on('click', '', e => {
       let id = jquery__WEBPACK_IMPORTED_MODULE_2___default()(e.target).parent().data('value');
       that.doFileDelete(id);
       let arr = this.hiddenInput.val().split(',');
       this.hiddenInput.val(arr.filter(item => item !== id).join(','));
+    });
+    this.$el.find('.filetitle').on('click', '', e => {
+      let id = jquery__WEBPACK_IMPORTED_MODULE_2___default()(e.target).parent().data('value');
+      that.doFileDownload(id);
+    });
+    this.$el.find('.ui.label').on('click', '', e => {
+      if (jquery__WEBPACK_IMPORTED_MODULE_2___default()(e.target).hasClass('ui label')) {
+        let id = jquery__WEBPACK_IMPORTED_MODULE_2___default()(e.target).data('value');
+        that.doFileDownload(id);
+      }
     });
 
     // add event handler to file input.

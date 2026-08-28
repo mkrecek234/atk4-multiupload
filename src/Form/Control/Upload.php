@@ -90,8 +90,11 @@ class Upload extends \Atk4\Multiupload\MultiUpload
             $entity->delete();
         }
 
-        $js =  new \Atk4\Ui\Js\JsToast(['message' => $entity->get('meta_filename').' has been removed!', 'class' => 'success']);
-        return $js;
+        if ($entity) {
+            $js =  new \Atk4\Ui\Js\JsToast(['message' => $entity->get('meta_filename').' has been removed!', 'class' => 'success']);
+            return $js;
+        }
+
     }
     
     public  function downloaded($token)
