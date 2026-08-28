@@ -133,6 +133,11 @@ export default class multifileUpload extends atkPlugin {
 	  let id = $(e.target).parent().data('value');
       that.doFileDownload(id);
     });
+
+    this.$el.find('.ui.label').on('click', '', (e) => {
+      let id = $(e.target).data('value');
+      that.doFileDownload(id);
+    });
     
   	this.$el.find('.delete.icon').on('click', '', (e) => {
   	  let id = $(e.target).parent().data('value');

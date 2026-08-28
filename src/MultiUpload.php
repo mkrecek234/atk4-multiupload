@@ -8,6 +8,7 @@ use Atk4\Data\Model;
 use Atk4\Ui\Exception;
 use Atk4\Ui\Js\JsBlock;
 use Atk4\Ui\Js\JsExpressionable;
+use Psr\Http\Message\UploadedFileInterface;
 
 /**
  * Class Upload.
@@ -97,6 +98,17 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
 
     /** @var bool check if callback is trigger by one of the action. */
     private $_isCbRunning = false;
+
+    /**
+     * Local storage for the display value when this control is used
+     * standalone, i.e. NOT bound to a model entity field (no Form::addControl()/entityField).
+     *
+     * atk4/ui 6.0 removed View::$content and View::set() (#2073), so this class
+     * can no longer fall back on the base View content storage and needs its own.
+     *
+     * @var mixed
+     */
+    private $inputValue;
     
     protected function init(): void
         {   
@@ -145,13 +157,25 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
     /**
      * Set input field value.
      *
+     * When bound to a model entity field (normal case, e.g. via Form::addControl()),
+     * the value is written straight into the entity so it round-trips like any
+     * other form control. Otherwise it's kept in $this->inputValue, since
+     * atk4/ui 6.0 no longer provides View::set()/View::$content to fall back on.
+     *
      * @param mixed $value the field input value
+     * @param mixed $junk  kept for backward-compatibility, unused
      *
      * @return $this
      */
     public function setInput($value, $junk = null)
     {
-        return parent::set($value, $junk);
+        if ($this->entityField !== null) {
+            $this->entityField->set($value);
+        } else {
+            $this->inputValue = $value;
+        }
+
+        return $this;
     }
 
     /**
@@ -159,9 +183,9 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
      *
      * @return array|false|mixed|string|null
      */
-    public function getInputValue()
+    public function getInputValue() : ?string
     {
-        return $this->entityField ? $this->entityField->get() : $this->content;
+        return $this->entityField !== null ? $this->entityField->get() : $this->inputValue;
     }
 
     /**
@@ -191,49 +215,94 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
      * @param callable $fx
      */
     public function onUpload(\Closure $fx)
-    {   $this->hasUploadCb = true;
-    if (($_POST['f_upload_action'] ?? null) === self::UPLOAD_ACTION) {
-        $this->cb->set(function () use ($fx) {
-            $postFiles = [];
-            
-            for ($i = 0;; ++$i) {
-                $k = 'file' . ($i > 0 ? '-' . $i : '');
-                if (!isset($_FILES[$k])) {
-                    break;
-                }
-                
-                $postFile = $_FILES[$k];
-                if ($postFile['error'] !== 0) {
-                    // unset all details on upload error
-                    $postFile = array_intersect_key($postFile, array_flip(['error', 'name']));
-                }
-                $postFiles[] = $postFile;
-            }
-            
-            foreach ($postFiles as $postFile) {
-                
-            if (count($postFiles) > 0) {
-                $fileId = $postFile['name'];
-                $this->setFileId($fileId);
-                $this->setInput($fileId);
-            }
-            
-            $this->addJsAction($fx($postFile));
-            
-            if (count($postFiles) > 0 && reset($postFiles)['error'] === 0) {
+    {
+        $this->hasUploadCb = true;
+        if ($this->getApp()->tryGetRequestPostParam('f_upload_action') === self::UPLOAD_ACTION) {
+            $this->cb->set(function () use ($fx) {
+                $postFiles = [];
 
-                $this->addJsAction([
-                    $this->js()->atkmultiFileUpload('updateField', [$this->fileId, $postFile['name']]),
-                ]);
+                for ($i = 0;; ++$i) {
+                    $k = 'file' . ($i > 0 ? '-' . $i : '');
+                    $uploadedFile = $this->getApp()->tryGetRequestUploadedFile($k);
+                    if ($uploadedFile === null) {
+                        break;
+                    }
+
+                    $postFile = $this->uploadedFileToLegacyArray($uploadedFile);
+                    if ($postFile['error'] !== \UPLOAD_ERR_OK) {
+                        // unset all details on upload error
+                        $postFile = array_intersect_key($postFile, array_flip(['error', 'name']));
+                    }
+                    $postFiles[] = $postFile;
                 }
-            }
 
-            $this->jsActions[] =
-                new \Atk4\Ui\Js\JsExpression("$(this).parents('.form.ui.initial').data('isDirty', true)");
+                foreach ($postFiles as $postFile) {
+                    if (count($postFiles) > 0) {
+                        $fileId = $postFile['name'];
+                        $this->setFileId($fileId);
+                        $this->setInput($fileId);
+                    }
 
-            return new JsBlock($this->jsActions);
-        });
+                    $this->addJsAction($fx($postFile));
+
+                    if (count($postFiles) > 0 && reset($postFiles)['error'] === \UPLOAD_ERR_OK) {
+                        $this->addJsAction([
+                            $this->js()->atkmultiFileUpload('updateField', [$this->fileId, $postFile['name']]),
+                        ]);
+                    }
+                }
+
+                $this->jsActions[] =
+                    new \Atk4\Ui\Js\JsExpression("$(this).parents('.form.ui.initial').data('isDirty', true)");
+
+                return new JsBlock($this->jsActions);
+            });
+        }
     }
+
+    /**
+     * Converts a PSR-7 UploadedFileInterface (as returned by App::getRequest())
+     * into the legacy $_FILES-shaped array (['name', 'type', 'size', 'error', 'tmp_name'])
+     * so that existing/derived onUpload() handlers (e.g. Form\Control\Upload::uploaded())
+     * keep working unchanged against atk4/ui 6.0+, which no longer guarantees
+     * populated $_FILES/$_POST superglobals and instead exposes uploads via PSR-7.
+     *
+     * @return array{name: string|null, type: string|null, size: int|null, error: int, tmp_name: string|null}
+     */
+    private function uploadedFileToLegacyArray(UploadedFileInterface $uploadedFile): array
+    {
+        $result = [
+            'name' => $uploadedFile->getClientFilename(),
+            'type' => $uploadedFile->getClientMediaType(),
+            'size' => $uploadedFile->getSize(),
+            'error' => $uploadedFile->getError(),
+            'tmp_name' => null,
+        ];
+
+        if ($result['error'] === \UPLOAD_ERR_OK) {
+            $stream = $uploadedFile->getStream();
+            $uri = $stream->getMetadata('uri');
+
+            if (is_string($uri) && is_file($uri)) {
+                // most PSR-7 implementations (Nyholm, Laminas Diactoros, Guzzle)
+                // back an un-moved uploaded file with a real filesystem path
+                $result['tmp_name'] = $uri;
+            } else {
+                // fallback: persist the stream to a real temp file so that consumers
+                // relying on a filesystem path (getimagesize(), md5_file(), fopen(), ...)
+                // keep working regardless of the underlying PSR-7 implementation
+                $tmpPath = tempnam(sys_get_temp_dir(), 'atk4upl');
+                $dest = fopen($tmpPath, 'wb');
+                $stream->rewind();
+                while (!$stream->eof()) {
+                    fwrite($dest, $stream->read(8192));
+                }
+                fclose($dest);
+                $result['tmp_name'] = $tmpPath;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -246,10 +315,10 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
     {
 
         $this->hasDeleteCb = true;
-        if (($_POST['f_upload_action'] ?? null) === self::DELETE_ACTION) {
+        if ($this->getApp()->tryGetRequestPostParam('f_upload_action') === self::DELETE_ACTION) {
             $this->cb->set(function () use ($fx) {
 
-                $fileName = $_POST['f_name'] ?? null; 
+                $fileName = $this->getApp()->tryGetRequestPostParam('f_name');
                 $this->addJsAction($fx($fileName));
 
                 $this->jsActions[] =
@@ -273,10 +342,10 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
     {
         
         $this->hasDeleteCb = true;
-        if (($_POST['f_upload_action'] ?? null) === self::DOWNLOAD_ACTION) {
+        if ($this->getApp()->tryGetRequestPostParam('f_upload_action') === self::DOWNLOAD_ACTION) {
             $this->cb->set(function () use ($fx) {
-                
-                $fileName = $_POST['f_name'] ?? null;
+
+                $fileName = $this->getApp()->tryGetRequestPostParam('f_name');
                 $this->addJsAction($fx($fileName));
 
                 return new JsBlock($this->jsActions);
@@ -329,7 +398,7 @@ class MultiUpload extends \Atk4\Ui\Form\Control\Dropdown
         parent::renderView();
 
         if ($this->cb->canTerminate()) {
-            $uploadActionRaw = $_POST['f_upload_action'] ?? null;
+            $uploadActionRaw = $this->getApp()->tryGetRequestPostParam('f_upload_action');
             if (!$this->hasUploadCb && ($uploadActionRaw === self::UPLOAD_ACTION)) {
                 throw new Exception('Missing onUpload callback.');
             } elseif (!$this->hasDeleteCb && ($uploadActionRaw === self::DELETE_ACTION)) {

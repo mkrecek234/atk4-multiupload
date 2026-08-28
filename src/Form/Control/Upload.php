@@ -48,7 +48,7 @@ class Upload extends \Atk4\Multiupload\MultiUpload
         // provision a new file for specified flysystem
         $model = $this->entityField->getField()->fileModel;
         $entity = $model->newFile();
-        
+
         // add (or upload) the file
         $stream = fopen($file['tmp_name'], 'r+');
         $this->entityField->getField()->flysystem->writeStream($entity->get('location'), $stream, ['visibility' => 'public']);

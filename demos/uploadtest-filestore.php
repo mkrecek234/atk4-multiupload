@@ -51,7 +51,7 @@ class Friend extends \Atk4\Data\Model {
 
 $form = Form::addTo($app);
 $model = new Friend($app->db, ['filesystem' => $app->filesystem]);
-$entity = $model->tryLoad(1);
+$entity = $model->tryLoadAny();
 if (!$entity) { $entity = $model->createEntity(); }
 $form->setEntity($entity);
 $form->onSubmit(function($form)  {
