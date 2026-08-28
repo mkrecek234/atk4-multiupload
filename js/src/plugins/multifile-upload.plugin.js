@@ -128,6 +128,13 @@ export default class multifileUpload extends atkPlugin {
     });
     
 	// Add click events for items.
+    this.$el.find('.delete.icon').on('click', '', (e) => {
+      let id = $(e.target).parent().data('value');
+      that.doFileDelete(id);
+      let arr = this.hiddenInput.val().split(',')
+      this.hiddenInput.val(arr.filter(item => item !== id).join(','))
+    });
+
 
     this.$el.find('.filetitle').on('click', '', (e) => {
 	  let id = $(e.target).parent().data('value');
@@ -135,16 +142,12 @@ export default class multifileUpload extends atkPlugin {
     });
 
     this.$el.find('.ui.label').on('click', '', (e) => {
-      let id = $(e.target).data('value');
-      that.doFileDownload(id);
+      if ($(e.target).hasClass('ui label')) {
+        let id = $(e.target).data('value');
+        that.doFileDownload(id);
+      }
     });
     
-  	this.$el.find('.delete.icon').on('click', '', (e) => {
-  	  let id = $(e.target).parent().data('value');
-  	  that.doFileDelete(id);
-      let arr = this.hiddenInput.val().split(',')
-      this.hiddenInput.val(arr.filter(item => item !== id).join(','))
-    });
 
     // add event handler to file input.
     this.fileInput.on('change', (e) => {
